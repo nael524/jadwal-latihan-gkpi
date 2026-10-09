@@ -214,6 +214,15 @@ const SCHEDULE_DATA = [
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
+  }, {
+    id: 21,
+    day: 'JUMAT (JR)',
+    date: '18 Desember 2026',
+    time: '18.00 Malam',
+    location: 'Gereja GKPI Immanuel',
+    hasSpecialSnack: true,
+    snackTitle: 'Air Mineral (Clean Q)',
+    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   }
 ];
 

@@ -211,11 +211,20 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
-    hasSpecialSnack: true,
+    hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   }, {
     id: 21,
+    day: 'KAMIS (PRA JR)',
+    date: '17 Desember 2026',
+    time: '18.00 Malam',
+    location: 'Gereja GKPI Immanuel',
+    hasSpecialSnack: true,
+    snackTitle: 'Air Mineral (Clean Q)',
+    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
+  }, , {
+    id: 22,
     day: 'JUMAT (JR)',
     date: '18 Desember 2026',
     time: '18.00 Malam',

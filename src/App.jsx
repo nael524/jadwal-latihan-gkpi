@@ -437,7 +437,7 @@ export default function App() {
           </h2>
 
           <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto font-medium">
-            11 Oktober 2026 – 15 Desember 2026 &bull; Setiap Minggu (14.00) & Selasa (19.00)
+            11 Oktober 2026 – 18 Desember 2026 &bull; Gereja GKPI Immanuel, Jl. Tanjung Mulia, Medan
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">

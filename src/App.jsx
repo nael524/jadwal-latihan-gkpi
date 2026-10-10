@@ -13,7 +13,8 @@ import {
   Volume2,
   BellRing,
   CheckCircle2,
-  XCircle
+  XCircle,
+  AlertCircle
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -244,7 +245,6 @@ const SCHEDULE_DATA = [
   }
 ];
 
-// Suara notifikasi
 const playCuteNotificationSound = () => {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -284,28 +284,69 @@ export default function App() {
   const [nextSchedule, setNextSchedule] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
 
   const timerRef = useRef(null);
 
-  // Fungsi untuk memicu Notifikasi HP
-  const triggerDeviceNotification = (schedule) => {
-    if (!schedule) return;
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Pengingat Latihan Natal GKPI! 🔔', {
-        body: `Hallo! Jangan lupa ya hari ${schedule.day.toLowerCase()} ini ada latihan tanggal ${schedule.date} jam ${schedule.time}. Jangan telat!`,
-        icon: '/favicon.ico',
-        tag: 'gkpi-practice-reminder'
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch((err) => {
+        console.log('SW Registration fallback:', err);
       });
+    }
+  }, []);
+
+  const triggerToastAlert = (message) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 5000);
+  };
+
+  const sendPushToDevice = async (schedule) => {
+    if (!schedule) return;
+
+    const title = 'Pengingat Latihan Natal GKPI! 🔔';
+    const bodyText = `Hallo! Jangan lupa ya hari ${schedule.day.toLowerCase()} ini ada latihan tanggal ${schedule.date} jam ${schedule.time}. Jangan telat!`;
+
+    // 1. Tampilkan Banner Toast Pengingat Langsung di Aplikasi
+    triggerToastAlert(bodyText);
+
+    // 2. Coba kirim via Service Worker
+    if ('serviceWorker' in navigator) {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg && reg.showNotification) {
+          await reg.showNotification(title, {
+            body: bodyText,
+            icon: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
+            badge: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
+            vibrate: [200, 100, 200],
+            tag: 'gkpi-practice-reminder',
+            renotify: true
+          });
+          return;
+        }
+      } catch (err) {
+        console.log('SW Notification error:', err);
+      }
+    }
+
+    // 3. Fallback Web Notification Standard
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(title, { body: bodyText });
+      } catch (e) {
+        console.log('Notification API Blocked by OS:', e);
+      }
     }
   };
 
-  // Fungsi untuk memulai timer 3 jam sekali
   const startThreeHourTimer = (schedule) => {
     if (timerRef.current) clearInterval(timerRef.current);
     const THREE_HOURS = 3 * 60 * 60 * 1000;
-
     timerRef.current = setInterval(() => {
-      triggerDeviceNotification(schedule);
+      sendPushToDevice(schedule);
     }, THREE_HOURS);
   };
 
@@ -324,7 +365,6 @@ export default function App() {
         playCuteNotificationSound();
       }, 300);
 
-      // Jika izin sudah pernah diberikan sebelumnya, jalankan timer 3 jam
       if (localStorage.getItem('device_notification_granted') === 'true') {
         startThreeHourTimer(activeSchedule);
       }
@@ -336,12 +376,10 @@ export default function App() {
     };
   }, []);
 
-  // Handler Tutup Pop-Up Utama
   const handleCloseScheduleNotice = () => {
     playCuteNotificationSound();
     setShowNotice(false);
 
-    // Cek apakah pernah minta izin sebelumnya
     const hasPrompted = localStorage.getItem('device_notification_asked');
     if (!hasPrompted) {
       setTimeout(() => {
@@ -350,36 +388,37 @@ export default function App() {
     }
   };
 
-  // Handler saat tombol "IZINKAN NOTIFIKASI" ditekan
   const handleAllowNotifications = async () => {
     localStorage.setItem('device_notification_asked', 'true');
     setShowPermissionPrompt(false);
 
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        localStorage.setItem('device_notification_granted', 'true');
+    playCuteNotificationSound();
 
-        // 1. Langsung munculkan notifikasi PERTAMA KALI detik ini juga
-        if (nextSchedule) {
-          triggerDeviceNotification(nextSchedule);
-          // 2. Mulai pengulangan otomatis setiap 3 JAM berikutnya
-          startThreeHourTimer(nextSchedule);
+    if ('Notification' in window) {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          localStorage.setItem('device_notification_granted', 'true');
+        } else {
+          localStorage.setItem('device_notification_granted', 'false');
         }
-      } else {
-        localStorage.setItem('device_notification_granted', 'false');
+      } catch (error) {
+        console.error('Permission error:', error);
       }
+    }
+
+    if (nextSchedule) {
+      await sendPushToDevice(nextSchedule);
+      startThreeHourTimer(nextSchedule);
     }
   };
 
-  // Handler saat tombol "TIDAK, TERIMA KASIH" ditekan
   const handleDenyNotifications = () => {
     localStorage.setItem('device_notification_asked', 'true');
     localStorage.setItem('device_notification_granted', 'false');
     setShowPermissionPrompt(false);
   };
 
-  // Filter schedule
   const filteredSchedule = SCHEDULE_DATA.filter((item) => {
     const matchDay = filterDay === 'SEMUA' || item.day === filterDay;
     const matchMonth = filterMonth === 'SEMUA' || item.date.includes(filterMonth);
@@ -388,9 +427,32 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-b from-white via-sky-50/60 to-blue-100/40 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white"
+      className="min-h-screen bg-gradient-to-b from-white via-sky-50/60 to-blue-100/40 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative"
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
+      {/* TOAST BANNER NOTIFIKASI AKTIF (MUNCUL DI ATAS LAYAR HP) */}
+      {toastMessage && (
+        <div className="fixed top-4 left-4 right-4 z-[100] max-w-md mx-auto animate-in slide-in-from-top-5 duration-300">
+          <div className="bg-slate-900 border-2 border-[#C2F215] text-white p-4 rounded-2xl shadow-2xl flex items-start gap-3">
+            <Bell className="w-6 h-6 text-[#C2F215] shrink-0 animate-bounce mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-extrabold text-xs text-[#C2F215] uppercase tracking-wider">
+                Pengingat Latihan Natal GKPI! 🔔
+              </h4>
+              <p className="text-xs text-slate-200 mt-1 font-medium leading-snug">
+                {toastMessage}
+              </p>
+            </div>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="text-slate-400 hover:text-white p-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <div>
         <header className="pt-10 pb-8 px-4 text-center max-w-2xl mx-auto relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -411,7 +473,6 @@ export default function App() {
             11 Oktober 2026 – 15 Desember 2026 &bull; Setiap Minggu (14.00) & Selasa (19.00)
           </p>
 
-          {/* Quick Filters */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
             <div className="flex items-center bg-white/95 backdrop-blur-md rounded-2xl p-1.5 border border-blue-200/90 shadow-md text-xs font-semibold">
               <span className="px-2 text-slate-500 flex items-center gap-1 font-medium">
@@ -668,7 +729,7 @@ export default function App() {
 
                   <div className="bg-slate-950/90 border border-amber-400/40 rounded-2xl p-4 font-black text-amber-300 text-sm sm:text-base shadow-inner flex flex-col items-center justify-center gap-2">
                     <span> MAKAN ROTI & MINUM BANDREK</span>
-                    <span className="text-xs text-cyan-300 font-semibold flex items-center gap-1">
+                    <span className="text-xs text-[#C2F215] font-semibold flex items-center gap-1">
                       <Droplets className="w-4 h-4 text-cyan-400" /> + Clean Q Air Mineral
                     </span>
                   </div>

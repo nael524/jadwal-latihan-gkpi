@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Clock,
   Utensils,
@@ -10,7 +10,10 @@ import {
   Bell,
   MapPin,
   Calendar,
-  Volume2
+  Volume2,
+  BellRing,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -241,7 +244,7 @@ const SCHEDULE_DATA = [
   }
 ];
 
-// Fungsi pembuat efek suara lucu (Pop / Plink) menggunakan Web Audio API
+// Suara notifikasi
 const playCuteNotificationSound = () => {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -254,8 +257,6 @@ const playCuteNotificationSound = () => {
 
       osc.type = type;
       osc.frequency.setValueAtTime(freq, startTime);
-
-      // Effect bounce pitch naik
       osc.frequency.exponentialRampToValueAtTime(freq * 1.5, startTime + duration);
 
       gain.gain.setValueAtTime(0.15, startTime);
@@ -269,11 +270,10 @@ const playCuteNotificationSound = () => {
     };
 
     const now = ctx.currentTime;
-    // Nada 1 (C6) & Nada 2 (G6) bergaya game/kartun lucu
     playTone(1046.50, 'sine', now, 0.12);
     playTone(1567.98, 'triangle', now + 0.1, 0.2);
   } catch (e) {
-    console.log('Audio autoplay blocked or not supported:', e);
+    console.log('Audio error:', e);
   }
 };
 
@@ -283,8 +283,32 @@ export default function App() {
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [nextSchedule, setNextSchedule] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
+  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
 
-  // Load Poppins Font dynamically & Ambil jadwal aktif pertama
+  const timerRef = useRef(null);
+
+  // Fungsi untuk memicu Notifikasi HP
+  const triggerDeviceNotification = (schedule) => {
+    if (!schedule) return;
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Pengingat Latihan Natal GKPI! 🔔', {
+        body: `Hallo! Jangan lupa ya hari ${schedule.day.toLowerCase()} ini ada latihan tanggal ${schedule.date} jam ${schedule.time}. Jangan telat!`,
+        icon: '/favicon.ico',
+        tag: 'gkpi-practice-reminder'
+      });
+    }
+  };
+
+  // Fungsi untuk memulai timer 3 jam sekali
+  const startThreeHourTimer = (schedule) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    const THREE_HOURS = 3 * 60 * 60 * 1000;
+
+    timerRef.current = setInterval(() => {
+      triggerDeviceNotification(schedule);
+    }, THREE_HOURS);
+  };
+
   useEffect(() => {
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap';
@@ -296,18 +320,66 @@ export default function App() {
     if (activeSchedule) {
       setNextSchedule(activeSchedule);
       setShowNotice(true);
-      // Mainkan bunyi notif lucu begitu web dibuka
       setTimeout(() => {
         playCuteNotificationSound();
       }, 300);
+
+      // Jika izin sudah pernah diberikan sebelumnya, jalankan timer 3 jam
+      if (localStorage.getItem('device_notification_granted') === 'true') {
+        startThreeHourTimer(activeSchedule);
+      }
     }
 
     return () => {
       document.head.removeChild(link);
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
 
-  // Filter schedule based on user selected criteria
+  // Handler Tutup Pop-Up Utama
+  const handleCloseScheduleNotice = () => {
+    playCuteNotificationSound();
+    setShowNotice(false);
+
+    // Cek apakah pernah minta izin sebelumnya
+    const hasPrompted = localStorage.getItem('device_notification_asked');
+    if (!hasPrompted) {
+      setTimeout(() => {
+        setShowPermissionPrompt(true);
+      }, 300);
+    }
+  };
+
+  // Handler saat tombol "IZINKAN NOTIFIKASI" ditekan
+  const handleAllowNotifications = async () => {
+    localStorage.setItem('device_notification_asked', 'true');
+    setShowPermissionPrompt(false);
+
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        localStorage.setItem('device_notification_granted', 'true');
+
+        // 1. Langsung munculkan notifikasi PERTAMA KALI detik ini juga
+        if (nextSchedule) {
+          triggerDeviceNotification(nextSchedule);
+          // 2. Mulai pengulangan otomatis setiap 3 JAM berikutnya
+          startThreeHourTimer(nextSchedule);
+        }
+      } else {
+        localStorage.setItem('device_notification_granted', 'false');
+      }
+    }
+  };
+
+  // Handler saat tombol "TIDAK, TERIMA KASIH" ditekan
+  const handleDenyNotifications = () => {
+    localStorage.setItem('device_notification_asked', 'true');
+    localStorage.setItem('device_notification_granted', 'false');
+    setShowPermissionPrompt(false);
+  };
+
+  // Filter schedule
   const filteredSchedule = SCHEDULE_DATA.filter((item) => {
     const matchDay = filterDay === 'SEMUA' || item.day === filterDay;
     const matchMonth = filterMonth === 'SEMUA' || item.date.includes(filterMonth);
@@ -391,10 +463,8 @@ export default function App() {
                   key={item.id}
                   className="group relative bg-gradient-to-r from-[#0a2752] via-[#0d346c] to-[#071f42] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-900/40 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-white"
                 >
-                  {/* Card Glow on Hover */}
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl sm:rounded-3xl"></div>
 
-                  {/* Left Section: Day Badge & Date */}
                   <div className="flex items-center gap-3.5 shrink-0 z-10">
                     <div className="bg-[#C2F215] text-slate-950 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md flex flex-col items-center justify-center min-w-[82px] text-center border border-lime-300 transform group-hover:scale-105 transition-transform duration-200">
                       <span>{item.day}</span>
@@ -403,7 +473,6 @@ export default function App() {
                       </span>
                     </div>
 
-                    {/* Date Info */}
                     <div className="space-y-0.5">
                       <div className="text-[10px] text-cyan-300 uppercase font-bold tracking-widest flex items-center gap-1">
                         <CalendarDays className="w-3 h-3 text-cyan-400" />
@@ -415,7 +484,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Middle Section: Time */}
                   <div className="hidden sm:flex flex-col items-center justify-center space-y-0.5 px-3 z-10 border-x border-blue-700/40">
                     <div className="text-[10px] text-blue-300 uppercase font-bold tracking-widest flex items-center gap-1">
                       <Clock className="w-3 h-3 text-cyan-400" />
@@ -426,7 +494,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Right Section: Konsumsi Button */}
                   <div className="flex items-center justify-end w-full sm:w-auto ml-auto z-10">
                     <button
                       onClick={() => setSelectedSchedule(item)}
@@ -447,22 +514,19 @@ export default function App() {
         SELAMAT LATIHAN PEMUDA PEMUDI GKPI IMMANUEL
       </footer>
 
-      {/* POPUP NOTIFIKASI DINAMIS DENGAN SOUND SFX */}
+      {/* POPUP NOTIFIKASI JADWAL TERDEKAT */}
       {showNotice && nextSchedule && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
           <div className="bg-slate-900 border border-blue-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
 
-            {/* Ambient Background Glow */}
             <div className="absolute -top-12 -left-12 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
             <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[#C2F215]/10 rounded-full blur-2xl pointer-events-none"></div>
 
-            {/* Header Icon & Title */}
             <div className="flex flex-col items-center gap-2">
               <div className="relative">
                 <div className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 text-white">
                   <Bell className="w-7 h-7 animate-bounce" />
                 </div>
-                {/* Tombol tes bunyi notif */}
                 <button
                   onClick={playCuteNotificationSound}
                   title="Putar Suara Notifikasi"
@@ -480,7 +544,6 @@ export default function App() {
               </p>
             </div>
 
-            {/* Dynamic Highlight Card berdasarkan Array Item */}
             <div className="bg-slate-950/80 border border-blue-800/60 rounded-2xl p-4 text-left space-y-3 shadow-inner">
               <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
                 <span className="bg-[#C2F215] text-slate-950 font-black text-xs px-3 py-1 rounded-xl shadow-md uppercase">
@@ -504,21 +567,59 @@ export default function App() {
               </div>
             </div>
 
-            {/* Message Text */}
             <p className="text-xs text-slate-300 font-medium leading-relaxed px-1">
               Jangan lupa latihan hari {nextSchedule.day.toLowerCase()} ini ya, jangan sampai telat!
             </p>
 
-            {/* Button OKE */}
             <button
-              onClick={() => {
-                playCuteNotificationSound();
-                setShowNotice(false);
-              }}
+              onClick={handleCloseScheduleNotice}
               className="w-full bg-[#C2F215] hover:bg-lime-400 text-slate-950 font-black text-xs py-3.5 rounded-2xl uppercase tracking-widest transition-all shadow-lg shadow-lime-400/20 active:scale-95"
             >
               OKE, SIAP!
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP IZIN NOTIFIKASI PERANGKAT */}
+      {showPermissionPrompt && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
+          <div className="bg-slate-900 border border-cyan-500/40 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden animate-in fade-in zoom-in-95">
+
+            <div className="w-16 h-16 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto text-white shadow-lg shadow-cyan-500/30">
+              <BellRing className="w-8 h-8 animate-pulse" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-extrabold text-base sm:text-lg text-white tracking-wide">
+                IZINKAN NOTIFIKASI HP?
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                Izinkan kami mengirimkan pengingat latihan langsung ke HP kamu sekarang dan setiap 3 jam sekali agar tidak ketinggalan jadwal.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2.5 pt-1">
+              <button
+                onClick={handleAllowNotifications}
+                className="w-full bg-[#C2F215] hover:bg-lime-400 text-slate-950 font-black text-xs py-3 rounded-2xl uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4 text-slate-950" />
+                IZINKAN NOTIFIKASI
+              </button>
+
+              <button
+                onClick={handleDenyNotifications}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-3 rounded-2xl uppercase tracking-wider transition-all border border-slate-700 active:scale-95 flex items-center justify-center gap-2"
+              >
+                <XCircle className="w-4 h-4 text-slate-400" />
+                TIDAK, TERIMA KASIH
+              </button>
+            </div>
+
+            <p className="text-[10px] text-slate-500 italic">
+              *Pilihan ini hanya akan ditanyakan 1x saja di HP kamu.
+            </p>
           </div>
         </div>
       )}
@@ -528,7 +629,6 @@ export default function App() {
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-200">
           <div className="bg-slate-900 w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-blue-500/30 max-h-[90vh] flex flex-col text-slate-100">
 
-            {/* Modal Header */}
             <div className="bg-gradient-to-r from-[#082247] via-[#0c2f60] to-[#082247] p-4 text-white flex items-center justify-between border-b border-blue-700/40">
               <div className="flex items-center gap-3">
                 <span className="bg-[#C2F215] text-slate-950 font-black text-xs px-3 py-1.5 rounded-xl shadow-md">
@@ -553,10 +653,8 @@ export default function App() {
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 overflow-y-auto space-y-4 text-xs text-slate-200 flex-1">
               {selectedSchedule.hasSpecialSnack ? (
-                /* Special Days */
                 <div className="bg-gradient-to-b from-amber-500/20 via-amber-950/30 to-slate-900 border-2 border-amber-400/50 rounded-2xl p-6 text-center space-y-4 relative overflow-hidden shadow-xl">
                   <div className="inline-flex items-center justify-center p-3.5 bg-amber-400/20 rounded-full text-amber-300 mb-0.5">
                     <Sparkles className="w-7 h-7 text-amber-400 animate-pulse" />
@@ -580,7 +678,6 @@ export default function App() {
                   </span>
                 </div>
               ) : (
-                /* Regular Days */
                 <div className="bg-blue-950/40 border border-blue-800/60 rounded-2xl p-6 text-center space-y-4 shadow-inner">
                   <div className="w-14 h-14 bg-cyan-500/20 border border-cyan-400/40 rounded-full flex items-center justify-center mx-auto text-cyan-300">
                     <Droplets className="w-7 h-7" />
@@ -605,7 +702,6 @@ export default function App() {
               </p>
             </div>
 
-            {/* Modal Footer */}
             <div className="bg-slate-950 p-4 border-t border-blue-900/60 flex items-center justify-between">
               <span className="text-[11px] text-blue-300/70 font-medium px-2">
                 Panitia Natal GKPI Immanuel

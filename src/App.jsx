@@ -6,7 +6,11 @@ import {
   Sparkles,
   Filter,
   CalendarDays,
-  Droplets
+  Droplets,
+  Bell,
+  MapPin,
+  Calendar,
+  Volume2
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -214,7 +218,8 @@ const SCHEDULE_DATA = [
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
-  }, {
+  },
+  {
     id: 21,
     day: 'KAMIS (PRA JR)',
     date: '17 Desember 2026',
@@ -223,7 +228,8 @@ const SCHEDULE_DATA = [
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
-  }, , {
+  },
+  {
     id: 22,
     day: 'JUMAT (JR)',
     date: '18 Desember 2026',
@@ -235,17 +241,67 @@ const SCHEDULE_DATA = [
   }
 ];
 
+// Fungsi pembuat efek suara lucu (Pop / Plink) menggunakan Web Audio API
+const playCuteNotificationSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+
+    const playTone = (freq, type, startTime, duration) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      // Effect bounce pitch naik
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.5, startTime + duration);
+
+      gain.gain.setValueAtTime(0.15, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    };
+
+    const now = ctx.currentTime;
+    // Nada 1 (C6) & Nada 2 (G6) bergaya game/kartun lucu
+    playTone(1046.50, 'sine', now, 0.12);
+    playTone(1567.98, 'triangle', now + 0.1, 0.2);
+  } catch (e) {
+    console.log('Audio autoplay blocked or not supported:', e);
+  }
+};
+
 export default function App() {
   const [filterDay, setFilterDay] = useState('SEMUA');
   const [filterMonth, setFilterMonth] = useState('SEMUA');
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [nextSchedule, setNextSchedule] = useState(null);
+  const [showNotice, setShowNotice] = useState(false);
 
-  // Load Poppins Font dynamically
+  // Load Poppins Font dynamically & Ambil jadwal aktif pertama
   useEffect(() => {
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
+
+    const activeSchedule = SCHEDULE_DATA.find((item) => item.date !== 'STAY TUNED');
+
+    if (activeSchedule) {
+      setNextSchedule(activeSchedule);
+      setShowNotice(true);
+      // Mainkan bunyi notif lucu begitu web dibuka
+      setTimeout(() => {
+        playCuteNotificationSound();
+      }, 300);
+    }
+
     return () => {
       document.head.removeChild(link);
     };
@@ -264,7 +320,6 @@ export default function App() {
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
       <div>
-        { }
         <header className="pt-10 pb-8 px-4 text-center max-w-2xl mx-auto relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -322,7 +377,6 @@ export default function App() {
           </div>
         </header>
 
-        { }
         <main className="max-w-2xl mx-auto px-4 pb-16 space-y-3.5">
           {filteredSchedule.length === 0 ? (
             <div className="bg-white rounded-3xl p-8 text-center text-slate-500 border border-blue-200/80 shadow-md font-medium">
@@ -389,12 +443,87 @@ export default function App() {
         </main>
       </div>
 
-      { }
       <footer className="bg-gradient-to-r from-[#061833] via-[#0b2b5c] to-[#061833] text-white text-center py-5 px-4 font-black text-xs sm:text-sm uppercase tracking-widest border-t-2 border-[#C2F215] shadow-2xl relative z-10">
         SELAMAT LATIHAN PEMUDA PEMUDI GKPI IMMANUEL
       </footer>
 
-      { }
+      {/* POPUP NOTIFIKASI DINAMIS DENGAN SOUND SFX */}
+      {showNotice && nextSchedule && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
+          <div className="bg-slate-900 border border-blue-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
+
+            {/* Ambient Background Glow */}
+            <div className="absolute -top-12 -left-12 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[#C2F215]/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            {/* Header Icon & Title */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 text-white">
+                  <Bell className="w-7 h-7 animate-bounce" />
+                </div>
+                {/* Tombol tes bunyi notif */}
+                <button
+                  onClick={playCuteNotificationSound}
+                  title="Putar Suara Notifikasi"
+                  className="absolute -top-1 -right-1 bg-[#C2F215] text-slate-950 p-1 rounded-full shadow-md hover:scale-110 transition-transform"
+                >
+                  <Volume2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <h3 className="font-extrabold text-lg text-white tracking-wide uppercase mt-1">
+                PEMBERITAHUAN LATIHAN
+              </h3>
+              <p className="text-xs text-slate-400 font-medium">
+                Hallo teman - teman GKPI Immanuel! 🎵
+              </p>
+            </div>
+
+            {/* Dynamic Highlight Card berdasarkan Array Item */}
+            <div className="bg-slate-950/80 border border-blue-800/60 rounded-2xl p-4 text-left space-y-3 shadow-inner">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <span className="bg-[#C2F215] text-slate-950 font-black text-xs px-3 py-1 rounded-xl shadow-md uppercase">
+                  HARI {nextSchedule.day}
+                </span>
+                <span className="text-cyan-300 font-extrabold text-xs flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                  Jam {nextSchedule.time}
+                </span>
+              </div>
+
+              <div className="space-y-1.5 pt-0.5">
+                <div className="flex items-center gap-2 text-slate-200 text-xs sm:text-sm font-bold">
+                  <Calendar className="w-4 h-4 text-blue-400 shrink-0" />
+                  <span>Tanggal: {nextSchedule.date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-300 text-xs font-medium">
+                  <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>{nextSchedule.location}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Message Text */}
+            <p className="text-xs text-slate-300 font-medium leading-relaxed px-1">
+              Jangan lupa latihan hari {nextSchedule.day.toLowerCase()} ini ya, jangan sampai telat!
+            </p>
+
+            {/* Button OKE */}
+            <button
+              onClick={() => {
+                playCuteNotificationSound();
+                setShowNotice(false);
+              }}
+              className="w-full bg-[#C2F215] hover:bg-lime-400 text-slate-950 font-black text-xs py-3.5 rounded-2xl uppercase tracking-widest transition-all shadow-lg shadow-lime-400/20 active:scale-95"
+            >
+              OKE, SIAP!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL KONSUMSI */}
       {selectedSchedule && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-200">
           <div className="bg-slate-900 w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-blue-500/30 max-h-[90vh] flex flex-col text-slate-100">

@@ -13,8 +13,7 @@ import {
   Volume2,
   BellRing,
   CheckCircle2,
-  XCircle,
-  AlertCircle
+  XCircle
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -284,60 +283,46 @@ export default function App() {
   const [nextSchedule, setNextSchedule] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null);
+  const [swRegistration, setSwRegistration] = useState(null);
 
   const timerRef = useRef(null);
 
+  // Registrasi Service Worker di HP
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch((err) => {
-        console.log('SW Registration fallback:', err);
-      });
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((reg) => {
+          setSwRegistration(reg);
+        })
+        .catch((err) => {
+          console.error('Service Worker Registration Failed:', err);
+        });
     }
   }, []);
 
-  const triggerToastAlert = (message) => {
-    setToastMessage(message);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 5000);
-  };
-
-  const sendPushToDevice = async (schedule) => {
+  // Memunculkan Notifikasi di Status Bar HP lewat Service Worker
+  const triggerDeviceNotification = async (schedule) => {
     if (!schedule) return;
 
     const title = 'Pengingat Latihan Natal GKPI! 🔔';
-    const bodyText = `Hallo! Jangan lupa ya hari ${schedule.day.toLowerCase()} ini ada latihan tanggal ${schedule.date} jam ${schedule.time}. Jangan telat!`;
+    const options = {
+      body: `Hallo! Jangan lupa ya hari ${schedule.day.toLowerCase()} ini ada latihan tanggal ${schedule.date} jam ${schedule.time}. Jangan telat!`,
+      icon: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
+      badge: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
+      vibrate: [200, 100, 200, 100, 200],
+      tag: 'gkpi-practice-reminder',
+      renotify: true,
+      requireInteraction: true
+    };
 
-    // 1. Tampilkan Banner Toast Pengingat Langsung di Aplikasi
-    triggerToastAlert(bodyText);
-
-    // 2. Coba kirim via Service Worker
-    if ('serviceWorker' in navigator) {
-      try {
-        const reg = await navigator.serviceWorker.ready;
-        if (reg && reg.showNotification) {
-          await reg.showNotification(title, {
-            body: bodyText,
-            icon: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
-            badge: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
-            vibrate: [200, 100, 200],
-            tag: 'gkpi-practice-reminder',
-            renotify: true
-          });
-          return;
-        }
-      } catch (err) {
-        console.log('SW Notification error:', err);
-      }
-    }
-
-    // 3. Fallback Web Notification Standard
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification(title, { body: bodyText });
-      } catch (e) {
-        console.log('Notification API Blocked by OS:', e);
+    // Panggil Service Worker untuk menampilkan notifikasi di HP
+    if (swRegistration && swRegistration.showNotification) {
+      await swRegistration.showNotification(title, options);
+    } else if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.ready;
+      if (reg && reg.showNotification) {
+        await reg.showNotification(title, options);
       }
     }
   };
@@ -346,7 +331,7 @@ export default function App() {
     if (timerRef.current) clearInterval(timerRef.current);
     const THREE_HOURS = 3 * 60 * 60 * 1000;
     timerRef.current = setInterval(() => {
-      sendPushToDevice(schedule);
+      triggerDeviceNotification(schedule);
     }, THREE_HOURS);
   };
 
@@ -374,7 +359,7 @@ export default function App() {
       document.head.removeChild(link);
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
+  }, [swRegistration]);
 
   const handleCloseScheduleNotice = () => {
     playCuteNotificationSound();
@@ -391,25 +376,30 @@ export default function App() {
   const handleAllowNotifications = async () => {
     localStorage.setItem('device_notification_asked', 'true');
     setShowPermissionPrompt(false);
-
     playCuteNotificationSound();
 
-    if ('Notification' in window) {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          localStorage.setItem('device_notification_granted', 'true');
-        } else {
-          localStorage.setItem('device_notification_granted', 'false');
-        }
-      } catch (error) {
-        console.error('Permission error:', error);
-      }
+    if (!('Notification' in window)) {
+      alert('Browser di HP ini belum mendukung fitur Notifikasi System.');
+      return;
     }
 
-    if (nextSchedule) {
-      await sendPushToDevice(nextSchedule);
-      startThreeHourTimer(nextSchedule);
+    try {
+      const permission = await Notification.requestPermission();
+
+      if (permission === 'granted') {
+        localStorage.setItem('device_notification_granted', 'true');
+
+        if (nextSchedule) {
+          // Kirim notifikasi pertama langsung ke status bar HP
+          await triggerDeviceNotification(nextSchedule);
+          startThreeHourTimer(nextSchedule);
+        }
+      } else {
+        localStorage.setItem('device_notification_granted', 'false');
+        alert('Izin notifikasi ditolak di HP kamu.');
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
     }
   };
 
@@ -430,29 +420,6 @@ export default function App() {
       className="min-h-screen bg-gradient-to-b from-white via-sky-50/60 to-blue-100/40 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative"
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
-      {/* TOAST BANNER NOTIFIKASI AKTIF (MUNCUL DI ATAS LAYAR HP) */}
-      {toastMessage && (
-        <div className="fixed top-4 left-4 right-4 z-[100] max-w-md mx-auto animate-in slide-in-from-top-5 duration-300">
-          <div className="bg-slate-900 border-2 border-[#C2F215] text-white p-4 rounded-2xl shadow-2xl flex items-start gap-3">
-            <Bell className="w-6 h-6 text-[#C2F215] shrink-0 animate-bounce mt-0.5" />
-            <div className="flex-1">
-              <h4 className="font-extrabold text-xs text-[#C2F215] uppercase tracking-wider">
-                Pengingat Latihan Natal GKPI! 🔔
-              </h4>
-              <p className="text-xs text-slate-200 mt-1 font-medium leading-snug">
-                {toastMessage}
-              </p>
-            </div>
-            <button
-              onClick={() => setToastMessage(null)}
-              className="text-slate-400 hover:text-white p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
       <div>
         <header className="pt-10 pb-8 px-4 text-center max-w-2xl mx-auto relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl pointer-events-none"></div>

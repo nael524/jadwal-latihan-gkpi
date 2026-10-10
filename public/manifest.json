@@ -1,0 +1,16 @@
+{
+  "short_name": "GKPI Natal",
+  "name": "Jadwal Latihan Natal GKPI Immanuel",
+  "icons": [
+    {
+      "src": "/src/assets/LOGO GKPI.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0a2752",
+  "theme_color": "#0a2752",
+  "display": "standalone"
+}

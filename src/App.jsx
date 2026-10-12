@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Clock,
   Utensils,
@@ -11,9 +11,7 @@ import {
   MapPin,
   Calendar,
   Volume2,
-  BellRing,
-  CheckCircle2,
-  XCircle
+  Music
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -24,16 +22,18 @@ const SCHEDULE_DATA = [
     date: '11, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal,Songlieader dan Mc',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
   },
   {
     id: 2,
-    day: 'SELASA',
-    date: '13, Oktober 2026',
+    day: 'JUMAT',
+    date: '16, Oktober 2026',
     time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
@@ -44,6 +44,7 @@ const SCHEDULE_DATA = [
     date: '18, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Pembagian Kegiatan Natal + Songleader ',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q) + Roti',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
@@ -54,6 +55,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal + Songleader ',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral + Roti',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -64,6 +66,7 @@ const SCHEDULE_DATA = [
     date: '25, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Drama +Prosesi + Songleader + Mc',
     hasSpecialSnack: false,
     snackTitle: 'Makan Roti & Minum Bandrek',
     snackNote: 'Spesial Minggu Ketiga: Makan Roti & Bandrek Panas + Clean Q'
@@ -74,6 +77,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -86,6 +90,7 @@ const SCHEDULE_DATA = [
     date: '01, November 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -96,6 +101,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -106,6 +112,7 @@ const SCHEDULE_DATA = [
     date: '08, November 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Makan Roti & Minum Bandrek',
     snackNote: 'Spesial Hari Ini: Makan Roti & Bandrek Panas (Gratis) + Clean Q'
@@ -116,6 +123,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -126,6 +134,7 @@ const SCHEDULE_DATA = [
     date: '15, November 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -136,6 +145,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -146,6 +156,7 @@ const SCHEDULE_DATA = [
     date: '22, November 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Makan Roti & Minum Bandrek',
     snackNote: 'Disediakan Gratis: Roti + Bandrek Hangat + Clean Q'
@@ -156,6 +167,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -166,6 +178,7 @@ const SCHEDULE_DATA = [
     date: '29, November 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -178,6 +191,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -188,6 +202,7 @@ const SCHEDULE_DATA = [
     date: '06, Desember 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Gladi Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Makan Roti & Minum Bandrek',
     snackNote: 'Makan Roti & Minum Bandrek Hangat Gratis saat Gladi'
@@ -198,6 +213,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -208,6 +224,7 @@ const SCHEDULE_DATA = [
     date: '13, Desember 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Gladi Resik Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Makan Roti & Minum Bandrek',
     snackNote: 'Makan Roti & Minum Bandrek Spesial Gladi Resik Akhir'
@@ -218,6 +235,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -225,9 +243,10 @@ const SCHEDULE_DATA = [
   {
     id: 21,
     day: 'KAMIS (PRA JR)',
-    date: '17 Desember 2026',
+    date: '17, Desember 2026',
     time: '18.00 Malam',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Gladi Bersama Pra-Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -235,14 +254,51 @@ const SCHEDULE_DATA = [
   {
     id: 22,
     day: 'JUMAT (JR)',
-    date: '18 Desember 2026',
+    date: '18, Desember 2026',
     time: '18.00 Malam',
     location: 'Gereja GKPI Immanuel',
+    activity: 'Perayaan Natal Pemuda',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   }
 ];
+
+// Helper konversi string tanggal ke Date Object
+const parseScheduleDate = (dateStr) => {
+  if (!dateStr || dateStr === 'STAY TUNED') return null;
+
+  const monthMap = {
+    'oktober': 9,
+    'november': 10,
+    'desember': 11
+  };
+
+  const parts = dateStr.replace(',', '').split(' ');
+  if (parts.length < 3) return null;
+
+  const day = parseInt(parts[0], 10);
+  const monthName = parts[1].toLowerCase();
+  const year = parseInt(parts[2], 10);
+
+  const month = monthMap[monthName];
+  if (month === undefined || isNaN(day) || isNaN(year)) return null;
+
+  return new Date(year, month, day, 0, 0, 0);
+};
+
+// Helper hitung selisih hari
+const getDaysDifference = (targetDate) => {
+  if (!targetDate) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const target = new Date(targetDate);
+  target.setHours(0, 0, 0, 0);
+
+  const diffTime = target.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
 
 const playCuteNotificationSound = () => {
   try {
@@ -281,59 +337,8 @@ export default function App() {
   const [filterMonth, setFilterMonth] = useState('SEMUA');
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [nextSchedule, setNextSchedule] = useState(null);
+  const [daysRemaining, setDaysRemaining] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
-  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
-  const [swRegistration, setSwRegistration] = useState(null);
-
-  const timerRef = useRef(null);
-
-  // Registrasi Service Worker di HP
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((reg) => {
-          setSwRegistration(reg);
-        })
-        .catch((err) => {
-          console.error('Service Worker Registration Failed:', err);
-        });
-    }
-  }, []);
-
-  // Memunculkan Notifikasi di Status Bar HP lewat Service Worker
-  const triggerDeviceNotification = async (schedule) => {
-    if (!schedule) return;
-
-    const title = 'Pengingat Latihan Natal GKPI! 🔔';
-    const options = {
-      body: `Hallo! Jangan lupa ya hari ${schedule.day.toLowerCase()} ini ada latihan tanggal ${schedule.date} jam ${schedule.time}. Jangan telat!`,
-      icon: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
-      badge: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
-      vibrate: [200, 100, 200, 100, 200],
-      tag: 'gkpi-practice-reminder',
-      renotify: true,
-      requireInteraction: true
-    };
-
-    // Panggil Service Worker untuk menampilkan notifikasi di HP
-    if (swRegistration && swRegistration.showNotification) {
-      await swRegistration.showNotification(title, options);
-    } else if ('serviceWorker' in navigator) {
-      const reg = await navigator.serviceWorker.ready;
-      if (reg && reg.showNotification) {
-        await reg.showNotification(title, options);
-      }
-    }
-  };
-
-  const startThreeHourTimer = (schedule) => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    const THREE_HOURS = 3 * 60 * 60 * 1000;
-    timerRef.current = setInterval(() => {
-      triggerDeviceNotification(schedule);
-    }, THREE_HOURS);
-  };
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -341,76 +346,38 @@ export default function App() {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 
-    const activeSchedule = SCHEDULE_DATA.find((item) => item.date !== 'STAY TUNED');
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
 
-    if (activeSchedule) {
-      setNextSchedule(activeSchedule);
+    // Cari jadwal terdekat yang belum lewat
+    const upcomingSchedule = SCHEDULE_DATA.find((item) => {
+      const scheduleDate = parseScheduleDate(item.date);
+      return scheduleDate && scheduleDate >= now;
+    });
+
+    if (upcomingSchedule) {
+      const parsedDate = parseScheduleDate(upcomingSchedule.date);
+      const diff = getDaysDifference(parsedDate);
+      setNextSchedule(upcomingSchedule);
+      setDaysRemaining(diff);
       setShowNotice(true);
       setTimeout(() => {
         playCuteNotificationSound();
       }, 300);
-
-      if (localStorage.getItem('device_notification_granted') === 'true') {
-        startThreeHourTimer(activeSchedule);
-      }
     }
 
     return () => {
       document.head.removeChild(link);
-      if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [swRegistration]);
+  }, []);
 
   const handleCloseScheduleNotice = () => {
     playCuteNotificationSound();
     setShowNotice(false);
-
-    const hasPrompted = localStorage.getItem('device_notification_asked');
-    if (!hasPrompted) {
-      setTimeout(() => {
-        setShowPermissionPrompt(true);
-      }, 300);
-    }
-  };
-
-  const handleAllowNotifications = async () => {
-    localStorage.setItem('device_notification_asked', 'true');
-    setShowPermissionPrompt(false);
-    playCuteNotificationSound();
-
-    if (!('Notification' in window)) {
-      alert('Browser di HP ini belum mendukung fitur Notifikasi System.');
-      return;
-    }
-
-    try {
-      const permission = await Notification.requestPermission();
-
-      if (permission === 'granted') {
-        localStorage.setItem('device_notification_granted', 'true');
-
-        if (nextSchedule) {
-          // Kirim notifikasi pertama langsung ke status bar HP
-          await triggerDeviceNotification(nextSchedule);
-          startThreeHourTimer(nextSchedule);
-        }
-      } else {
-        localStorage.setItem('device_notification_granted', 'false');
-        alert('Izin notifikasi ditolak di HP kamu.');
-      }
-    } catch (error) {
-      console.error('Error requesting notification permission:', error);
-    }
-  };
-
-  const handleDenyNotifications = () => {
-    localStorage.setItem('device_notification_asked', 'true');
-    localStorage.setItem('device_notification_granted', 'false');
-    setShowPermissionPrompt(false);
   };
 
   const filteredSchedule = SCHEDULE_DATA.filter((item) => {
-    const matchDay = filterDay === 'SEMUA' || item.day === filterDay;
+    const matchDay = filterDay === 'SEMUA' || item.day.includes(filterDay);
     const matchMonth = filterMonth === 'SEMUA' || item.date.includes(filterMonth);
     return matchDay && matchMonth;
   });
@@ -441,11 +408,11 @@ export default function App() {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-            <div className="flex items-center bg-white/95 backdrop-blur-md rounded-2xl p-1.5 border border-blue-200/90 shadow-md text-xs font-semibold">
+            <div className="flex flex-wrap items-center justify-center bg-white/95 backdrop-blur-md rounded-2xl p-1.5 border border-blue-200/90 shadow-md text-xs font-semibold">
               <span className="px-2 text-slate-500 flex items-center gap-1 font-medium">
                 <Filter className="w-3.5 h-3.5 text-blue-600" /> Hari:
               </span>
-              {['SEMUA', 'MINGGU', 'SELASA'].map((day) => (
+              {['SEMUA', 'MINGGU', 'SELASA', 'KAMIS', 'JUMAT'].map((day) => (
                 <button
                   key={day}
                   onClick={() => setFilterDay(day)}
@@ -509,6 +476,10 @@ export default function App() {
                       <div className="font-bold text-sm sm:text-base text-white tracking-wide font-sans">
                         {item.date}
                       </div>
+                      <div className="text-[11px] text-[#C2F215] font-semibold flex items-center gap-1">
+                        <Music className="w-3 h-3 text-[#C2F215]" />
+                        {item.activity}
+                      </div>
                     </div>
                   </div>
 
@@ -542,7 +513,7 @@ export default function App() {
         SELAMAT LATIHAN PEMUDA PEMUDI GKPI IMMANUEL
       </footer>
 
-      {/* POPUP NOTIFIKASI JADWAL TERDEKAT */}
+      {/* POPUP NOTIFIKASI JADWAL TERDEKAT DINAMIS */}
       {showNotice && nextSchedule && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
           <div className="bg-slate-900 border border-blue-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
@@ -564,11 +535,18 @@ export default function App() {
                 </button>
               </div>
 
-              <h3 className="font-extrabold text-lg text-white tracking-wide uppercase mt-1">
+              {/* STATUS HARI HITUNG MUNDUR */}
+              <div className="inline-block bg-blue-900/60 border border-blue-400/30 px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 uppercase tracking-widest mt-1">
+                {daysRemaining === 0 && '🔥 HARI INI BGT!'}
+                {daysRemaining === 1 && '⏰ BESOK LATIHAN!'}
+                {daysRemaining > 1 && ` ${daysRemaining} HARI LAGI`}
+              </div>
+
+              <h3 className="font-extrabold text-lg text-white tracking-wide uppercase">
                 PEMBERITAHUAN LATIHAN
               </h3>
               <p className="text-xs text-slate-400 font-medium">
-                Hallo teman - teman GKPI Immanuel! 🎵
+                Hallo teman - teman Pemuda-Pemudi GKPI Immanuel!
               </p>
             </div>
 
@@ -588,66 +566,40 @@ export default function App() {
                   <Calendar className="w-4 h-4 text-blue-400 shrink-0" />
                   <span>Tanggal: {nextSchedule.date}</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-300 text-xs font-medium">
-                  <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-                  <span>{nextSchedule.location}</span>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-1">
+                  <div className="flex items-center gap-2 text-slate-300 font-medium">
+                    <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>{nextSchedule.location}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-[#C2F215] font-bold bg-lime-400/10 px-2.5 py-1 rounded-lg border border-lime-400/20">
+                    <Sparkles className="w-3.5 h-3.5 text-[#C2F215] shrink-0" />
+                    <span>Kegiatan: {nextSchedule.activity}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* PESAN NOTIFIKASI SESUAI STATUS HARI */}
             <p className="text-xs text-slate-300 font-medium leading-relaxed px-1">
-              Jangan lupa latihan hari {nextSchedule.day.toLowerCase()} ini ya, jangan sampai telat!
+              {daysRemaining === 0 && (
+                <>Hari ini kita ada <strong className="text-[#C2F215]">{nextSchedule.activity}</strong> jam {nextSchedule.time}. Datang tepat waktu dan jangan telat ya! 🎵</>
+              )}
+              {daysRemaining === 1 && (
+                <>Jangan lupa besok hari {nextSchedule.day.toLowerCase()} kita ada <strong className="text-[#C2F215]">{nextSchedule.activity}</strong>. Persiapkan diri kamu! 🎼</>
+              )}
+              {daysRemaining > 1 && (
+                <>Ingat ya, {daysRemaining} hari lagi pada hari {nextSchedule.day.toLowerCase()} ({nextSchedule.date}) kita ada <strong className="text-[#C2F215]">{nextSchedule.activity}</strong>. Jangan sampai terlewat! </>
+              )}
             </p>
 
             <button
               onClick={handleCloseScheduleNotice}
               className="w-full bg-[#C2F215] hover:bg-lime-400 text-slate-950 font-black text-xs py-3.5 rounded-2xl uppercase tracking-widest transition-all shadow-lg shadow-lime-400/20 active:scale-95"
             >
-              OKE, SIAP!
+              {daysRemaining === 0 ? 'SIAP LATIHAN HARI INI!' : 'OKE, SIAP LATIHAN!'}
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* POPUP IZIN NOTIFIKASI PERANGKAT */}
-      {showPermissionPrompt && (
-        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
-          <div className="bg-slate-900 border border-cyan-500/40 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden animate-in fade-in zoom-in-95">
-
-            <div className="w-16 h-16 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto text-white shadow-lg shadow-cyan-500/30">
-              <BellRing className="w-8 h-8 animate-pulse" />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="font-extrabold text-base sm:text-lg text-white tracking-wide">
-                IZINKAN NOTIFIKASI HP?
-              </h3>
-              <p className="text-xs text-slate-300 leading-relaxed font-medium">
-                Izinkan kami mengirimkan pengingat latihan langsung ke HP kamu sekarang dan setiap 3 jam sekali agar tidak ketinggalan jadwal.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2.5 pt-1">
-              <button
-                onClick={handleAllowNotifications}
-                className="w-full bg-[#C2F215] hover:bg-lime-400 text-slate-950 font-black text-xs py-3 rounded-2xl uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
-              >
-                <CheckCircle2 className="w-4 h-4 text-slate-950" />
-                IZINKAN NOTIFIKASI
-              </button>
-
-              <button
-                onClick={handleDenyNotifications}
-                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-3 rounded-2xl uppercase tracking-wider transition-all border border-slate-700 active:scale-95 flex items-center justify-center gap-2"
-              >
-                <XCircle className="w-4 h-4 text-slate-400" />
-                TIDAK, TERIMA KASIH
-              </button>
-            </div>
-
-            <p className="text-[10px] text-slate-500 italic">
-              *Pilihan ini hanya akan ditanyakan 1x saja di HP kamu.
-            </p>
           </div>
         </div>
       )}

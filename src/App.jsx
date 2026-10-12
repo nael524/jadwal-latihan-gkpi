@@ -22,7 +22,7 @@ const SCHEDULE_DATA = [
     date: '11, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Koor Natal,Songlieader dan Mc',
+    activity: 'Latihan Koor Natal,Songleader dan Mc',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
@@ -44,7 +44,7 @@ const SCHEDULE_DATA = [
     date: '18, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Pembagian Kegiatan Natal + Songleader ',
+    activity: 'Pembagian Kegiatan Natal + Songleader',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q) + Roti',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
@@ -55,7 +55,7 @@ const SCHEDULE_DATA = [
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Koor Natal + Songleader ',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral + Roti',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -456,34 +456,34 @@ export default function App() {
               return (
                 <div
                   key={item.id}
-                  className="group relative bg-gradient-to-r from-[#0a2752] via-[#0d346c] to-[#071f42] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-900/40 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-white"
+                  className="group relative bg-gradient-to-r from-[#0a2752] via-[#0d346c] to-[#071f42] rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-900/40 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-white"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl sm:rounded-3xl"></div>
 
-                  <div className="flex items-center gap-3.5 shrink-0 z-10">
-                    <div className="bg-[#C2F215] text-slate-950 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md flex flex-col items-center justify-center min-w-[82px] text-center border border-lime-300 transform group-hover:scale-105 transition-transform duration-200">
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1 z-10">
+                    <div className="bg-[#C2F215] text-slate-950 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md flex flex-col items-center justify-center min-w-[82px] text-center border border-lime-300 transform group-hover:scale-105 transition-transform duration-200 shrink-0">
                       <span>{item.day}</span>
                       <span className="text-[10px] opacity-80 font-semibold font-sans mt-0.5">
                         {isSunday ? '14.00' : '19.00'}
                       </span>
                     </div>
 
-                    <div className="space-y-0.5">
+                    <div className="space-y-0.5 min-w-0 flex-1 pr-1">
                       <div className="text-[10px] text-cyan-300 uppercase font-bold tracking-widest flex items-center gap-1">
-                        <CalendarDays className="w-3 h-3 text-cyan-400" />
+                        <CalendarDays className="w-3 h-3 text-cyan-400 shrink-0" />
                         TANGGAL
                       </div>
-                      <div className="font-bold text-sm sm:text-base text-white tracking-wide font-sans">
+                      <div className="font-bold text-sm sm:text-base text-white tracking-wide font-sans truncate">
                         {item.date}
                       </div>
-                      <div className="text-[11px] text-[#C2F215] font-semibold flex items-center gap-1">
-                        <Music className="w-3 h-3 text-[#C2F215]" />
-                        {item.activity}
+                      <div className="text-[11px] sm:text-xs text-[#C2F215] font-semibold flex items-start gap-1.5 leading-tight pt-0.5 break-words">
+                        <Music className="w-3.5 h-3.5 text-[#C2F215] shrink-0 mt-0.5" />
+                        <span className="line-clamp-2">{item.activity}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="hidden sm:flex flex-col items-center justify-center space-y-0.5 px-3 z-10 border-x border-blue-700/40">
+                  <div className="hidden sm:flex flex-col items-center justify-center space-y-0.5 px-3 shrink-0 z-10 border-x border-blue-700/40">
                     <div className="text-[10px] text-blue-300 uppercase font-bold tracking-widest flex items-center gap-1">
                       <Clock className="w-3 h-3 text-cyan-400" />
                       JAM
@@ -493,7 +493,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end w-full sm:w-auto ml-auto z-10">
+                  <div className="flex items-center justify-end w-full sm:w-auto ml-auto shrink-0 z-10">
                     <button
                       onClick={() => setSelectedSchedule(item)}
                       className="bg-white hover:bg-[#C2F215] text-[#082247] hover:text-slate-950 font-black text-xs px-4 py-2.5 rounded-2xl uppercase tracking-wider transition-all duration-200 shadow-md hover:shadow-cyan-500/20 active:scale-95 flex items-center gap-2 shrink-0 border border-white/20"
@@ -539,7 +539,7 @@ export default function App() {
               <div className="inline-block bg-blue-900/60 border border-blue-400/30 px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 uppercase tracking-widest mt-1">
                 {daysRemaining === 0 && '🔥 HARI INI BGT!'}
                 {daysRemaining === 1 && '⏰ BESOK LATIHAN!'}
-                {daysRemaining > 1 && ` ${daysRemaining} HARI LAGI`}
+                {daysRemaining > 1 && `⏳ ${daysRemaining} HARI LAGI`}
               </div>
 
               <h3 className="font-extrabold text-lg text-white tracking-wide uppercase">
@@ -561,22 +561,20 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="space-y-1.5 pt-0.5">
+              <div className="space-y-2 pt-0.5">
                 <div className="flex items-center gap-2 text-slate-200 text-xs sm:text-sm font-bold">
                   <Calendar className="w-4 h-4 text-blue-400 shrink-0" />
                   <span>Tanggal: {nextSchedule.date}</span>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-1">
-                  <div className="flex items-center gap-2 text-slate-300 font-medium">
-                    <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span>{nextSchedule.location}</span>
-                  </div>
+                <div className="flex items-center gap-2 text-slate-300 text-xs font-medium">
+                  <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>{nextSchedule.location}</span>
+                </div>
 
-                  <div className="flex items-center gap-1.5 text-[#C2F215] font-bold bg-lime-400/10 px-2.5 py-1 rounded-lg border border-lime-400/20">
-                    <Sparkles className="w-3.5 h-3.5 text-[#C2F215] shrink-0" />
-                    <span>Kegiatan: {nextSchedule.activity}</span>
-                  </div>
+                <div className="flex items-start gap-1.5 text-[#C2F215] font-bold bg-lime-400/10 px-2.5 py-1.5 rounded-xl border border-lime-400/20 text-xs leading-snug break-words">
+                  <Sparkles className="w-4 h-4 text-[#C2F215] shrink-0 mt-0.5" />
+                  <span>Kegiatan: {nextSchedule.activity}</span>
                 </div>
               </div>
             </div>

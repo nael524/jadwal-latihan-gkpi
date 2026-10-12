@@ -332,7 +332,53 @@ const playCuteNotificationSound = () => {
   }
 };
 
+// --- EFEK LOADING LOGO GKPI ELEGAN & RESPONSITF ---
+const GKPILoader = ({ progress }) => (
+  <div className="fixed inset-0 bg-[#041226] text-white z-50 flex flex-col items-center justify-center p-4 selection:bg-[#C2F215] selection:text-slate-950 font-sans">
+    {/* Cahaya Latar Belakang */}
+    <div className="absolute w-72 h-72 sm:w-96 sm:h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
+
+    <div className="relative flex flex-col items-center max-w-sm w-full text-center z-10 space-y-6">
+
+      {/* Container Logo Bercahaya */}
+      <div className="relative flex items-center justify-center">
+        {/* Ring Putar Luar */}
+        <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-2 border-transparent border-t-[#C2F215] border-r-blue-400 animate-spin"></div>
+
+        {/* Glow Latar Logo */}
+        <div className="absolute w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-2xl blur-lg opacity-60 animate-pulse"></div>
+
+        {/* Siluet Logo GKPI / Salib Alkitab */}
+        <div className="absolute w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-tr from-[#082247] to-[#0f3b7a] border border-cyan-400/40 rounded-2xl flex items-center justify-center shadow-2xl backdrop-blur-md">
+          <svg className="w-10 h-10 sm:w-12 sm:h-12 text-[#C2F215] drop-shadow-[0_0_12px_rgba(194,242,21,0.6)]" viewBox="0 0 24 24" fill="currentColor">
+            {/* Bentuk Salib Modern */}
+            <rect x="10.5" y="3" width="3" height="18" rx="1.5" />
+            <rect x="4" y="7.5" width="16" height="3" rx="1.5" />
+            {/* Mahkota / Cahaya Atas */}
+            <path d="M12 2L13.5 5H10.5L12 2Z" fill="#38BDF8" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Teks Identitas */}
+      <div className="space-y-1.5 px-2">
+        <h2 className="text-xl sm:text-2xl font-black text-white tracking-wider uppercase font-sans drop-shadow-md">
+          GKPI IMMANUEL
+        </h2>
+        <p className="text-[11px] sm:text-xs font-semibold text-cyan-300 tracking-widest uppercase">
+          Resort Tanjung Mulia &bull; Medan
+        </p>
+      </div>
+
+
+
+    </div>
+  </div>
+);
+
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [filterDay, setFilterDay] = useState('SEMUA');
   const [filterMonth, setFilterMonth] = useState('SEMUA');
   const [selectedSchedule, setSelectedSchedule] = useState(null);
@@ -346,27 +392,43 @@ export default function App() {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
+    // Simulator Progress Loading
+    const progressInterval = setInterval(() => {
+      setLoadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 120);
 
-    // Cari jadwal terdekat yang belum lewat
-    const upcomingSchedule = SCHEDULE_DATA.find((item) => {
-      const scheduleDate = parseScheduleDate(item.date);
-      return scheduleDate && scheduleDate >= now;
-    });
+    const timer = setTimeout(() => {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
 
-    if (upcomingSchedule) {
-      const parsedDate = parseScheduleDate(upcomingSchedule.date);
-      const diff = getDaysDifference(parsedDate);
-      setNextSchedule(upcomingSchedule);
-      setDaysRemaining(diff);
-      setShowNotice(true);
-      setTimeout(() => {
-        playCuteNotificationSound();
-      }, 300);
-    }
+      const upcomingSchedule = SCHEDULE_DATA.find((item) => {
+        const scheduleDate = parseScheduleDate(item.date);
+        return scheduleDate && scheduleDate >= now;
+      });
+
+      if (upcomingSchedule) {
+        const parsedDate = parseScheduleDate(upcomingSchedule.date);
+        const diff = getDaysDifference(parsedDate);
+        setNextSchedule(upcomingSchedule);
+        setDaysRemaining(diff);
+        setShowNotice(true);
+        setTimeout(() => {
+          playCuteNotificationSound();
+        }, 400);
+      }
+
+      setIsLoading(false);
+    }, 1500);
 
     return () => {
+      clearInterval(progressInterval);
+      clearTimeout(timer);
       document.head.removeChild(link);
     };
   }, []);
@@ -387,6 +449,9 @@ export default function App() {
       className="min-h-screen bg-gradient-to-b from-white via-sky-50/60 to-blue-100/40 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative"
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
+      {/* TAMPILKAN EFEK LOADER LOGO GKPI JIKA MASIH LOADING */}
+      {isLoading && <GKPILoader progress={loadProgress} />}
+
       <div>
         <header className="pt-10 pb-8 px-4 text-center max-w-2xl mx-auto relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -514,7 +579,7 @@ export default function App() {
       </footer>
 
       {/* POPUP NOTIFIKASI JADWAL TERDEKAT DINAMIS */}
-      {showNotice && nextSchedule && (
+      {!isLoading && showNotice && nextSchedule && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
           <div className="bg-slate-900 border border-blue-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
 
@@ -625,7 +690,7 @@ export default function App() {
 
               <button
                 onClick={() => setSelectedSchedule(null)}
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10"
+                className="p-2 rounded-full bg-[#0a2752]/60 hover:bg-[#0a2752] text-white transition-colors border border-white/10"
               >
                 <X className="w-5 h-5" />
               </button>

@@ -602,7 +602,7 @@ export default function App() {
 
               {/* STATUS HARI HITUNG MUNDUR */}
               <div className="inline-block bg-blue-900/60 border border-blue-400/30 px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 uppercase tracking-widest mt-1">
-                {daysRemaining === 0 && '🔥 HARI INI BGT!'}
+                {daysRemaining === 0 && 'HARI INI BGT!'}
                 {daysRemaining === 1 && '⏰ BESOK LATIHAN!'}
                 {daysRemaining > 1 && `⏳ ${daysRemaining} HARI LAGI`}
               </div>

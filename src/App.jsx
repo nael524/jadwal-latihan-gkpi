@@ -40,9 +40,9 @@ const SCHEDULE_DATA = [
   },
   {
     id: 3,
-    day: 'STAY TUNED',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
+    day: 'SENIN',
+    date: '19, Oktober 2026',
+    time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
     activity: 'Pembagian Kegiatan Natal + Songleader',
     hasSpecialSnack: false,

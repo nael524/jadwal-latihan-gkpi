@@ -10,8 +10,15 @@ import {
   Bell,
   MapPin,
   Calendar,
-  Volume2,
-  Music
+  Music,
+  Home,
+  User,
+  CheckCircle2,
+  ShieldCheck,
+  LogIn,
+  ExternalLink,
+  Lock,
+  AlertCircle
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -264,7 +271,6 @@ const SCHEDULE_DATA = [
   }
 ];
 
-// Helper konversi string tanggal ke Date Object
 const parseScheduleDate = (dateStr) => {
   if (!dateStr || dateStr === 'STAY TUNED') return null;
 
@@ -287,10 +293,9 @@ const parseScheduleDate = (dateStr) => {
   return new Date(year, month, day, 0, 0, 0);
 };
 
-// Helper hitung selisih hari
 const getDaysDifference = (targetDate) => {
   if (!targetDate) return null;
-  const today = new Date();
+  const today = new Date(2026, 9, 16);
   today.setHours(0, 0, 0, 0);
 
   const target = new Date(targetDate);
@@ -332,53 +337,34 @@ const playCuteNotificationSound = () => {
   }
 };
 
-// --- EFEK LOADING LOGO GKPI ELEGAN & RESPONSITF ---
-const GKPILoader = ({ progress }) => (
-  <div className="fixed inset-0 bg-[#041226] text-white z-50 flex flex-col items-center justify-center p-4 selection:bg-[#C2F215] selection:text-slate-950 font-sans">
-    {/* Cahaya Latar Belakang */}
-    <div className="absolute w-72 h-72 sm:w-96 sm:h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
-
-    <div className="relative flex flex-col items-center max-w-sm w-full text-center z-10 space-y-6">
-
-      {/* Container Logo Bercahaya */}
+const GKPILoader = () => (
+  <div className="fixed inset-0 bg-white text-slate-900 z-50 flex flex-col items-center justify-center p-4 font-sans">
+    <div className="relative flex flex-col items-center max-w-sm w-full text-center space-y-6">
       <div className="relative flex items-center justify-center">
-        {/* Ring Putar Luar */}
-        <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-2 border-transparent border-t-[#C2F215] border-r-blue-400 animate-spin"></div>
-
-        {/* Glow Latar Logo */}
-        <div className="absolute w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-2xl blur-lg opacity-60 animate-pulse"></div>
-
-        {/* Siluet Logo GKPI / Salib Alkitab */}
-        <div className="absolute w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-tr from-[#082247] to-[#0f3b7a] border border-cyan-400/40 rounded-2xl flex items-center justify-center shadow-2xl backdrop-blur-md">
-          <svg className="w-10 h-10 sm:w-12 sm:h-12 text-[#C2F215] drop-shadow-[0_0_12px_rgba(194,242,21,0.6)]" viewBox="0 0 24 24" fill="currentColor">
-            {/* Bentuk Salib Modern */}
+        <div className="w-24 h-24 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
+        <div className="absolute w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
             <rect x="10.5" y="3" width="3" height="18" rx="1.5" />
             <rect x="4" y="7.5" width="16" height="3" rx="1.5" />
-            {/* Mahkota / Cahaya Atas */}
-            <path d="M12 2L13.5 5H10.5L12 2Z" fill="#38BDF8" />
+            <path d="M12 2L13.5 5H10.5L12 2Z" fill="#93C5FD" />
           </svg>
         </div>
       </div>
-
-      {/* Teks Identitas */}
-      <div className="space-y-1.5 px-2">
-        <h2 className="text-xl sm:text-2xl font-black text-white tracking-wider uppercase font-sans drop-shadow-md">
+      <div className="space-y-1">
+        <h2 className="text-xl font-black text-slate-900 tracking-wider uppercase">
           GKPI IMMANUEL
         </h2>
-        <p className="text-[11px] sm:text-xs font-semibold text-cyan-300 tracking-widest uppercase">
-          Resort Tanjung Mulia &bull; Medan
+        <p className="text-xs font-semibold text-blue-600 tracking-widest uppercase">
+          Resort Tanjung Mulia • Medan
         </p>
       </div>
-
-
-
     </div>
   </div>
 );
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [loadProgress, setLoadProgress] = useState(0);
+  const [activeTab, setActiveTab] = useState('home'); // 'home', 'schedule', 'account'
   const [filterDay, setFilterDay] = useState('SEMUA');
   const [filterMonth, setFilterMonth] = useState('SEMUA');
   const [selectedSchedule, setSelectedSchedule] = useState(null);
@@ -386,25 +372,28 @@ export default function App() {
   const [daysRemaining, setDaysRemaining] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
 
+  // STATE AUTHENTICATION LOGIN DENGAN LOCALSTORAGE persistence
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('gkpi_isLoggedIn') === 'true';
+  });
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [usernameInput, setUsernameInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  // KREDENSIAL VALIDASI
+  const VALID_USERNAME = 'pemuda';
+  const VALID_PASSWORD = 'natal2026';
+  const REDIRECT_URL = 'https://dokumentasi-orcin.vercel.app/';
+
   useEffect(() => {
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 
-    // Simulator Progress Loading
-    const progressInterval = setInterval(() => {
-      setLoadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 120);
-
     const timer = setTimeout(() => {
-      const now = new Date();
+      const now = new Date(2026, 9, 16);
       now.setHours(0, 0, 0, 0);
 
       const upcomingSchedule = SCHEDULE_DATA.find((item) => {
@@ -424,14 +413,46 @@ export default function App() {
       }
 
       setIsLoading(false);
-    }, 1500);
+    }, 1200);
 
     return () => {
-      clearInterval(progressInterval);
       clearTimeout(timer);
-      document.head.removeChild(link);
+      if (document.head.contains(link)) {
+        document.head.removeChild(link);
+      }
     };
   }, []);
+
+  const handleAccountTabClick = () => {
+    if (!isLoggedIn) {
+      setLoginError('');
+      setShowLoginModal(true);
+    } else {
+      setActiveTab('account');
+    }
+  };
+
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+
+    // Validasi Username & Password
+    if (usernameInput.trim().toLowerCase() === VALID_USERNAME && passwordInput === VALID_PASSWORD) {
+      setIsLoggedIn(true);
+      localStorage.setItem('gkpi_isLoggedIn', 'true'); // Simpan status login
+      setShowLoginModal(false);
+      setLoginError('');
+      setActiveTab('account');
+      window.open(REDIRECT_URL, '_blank');
+    } else {
+      setLoginError('Username atau password salah! Coba periksa kembali.');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem('gkpi_isLoggedIn'); // Hapus status login saat logout
+    setActiveTab('home');
+  };
 
   const handleCloseScheduleNotice = () => {
     playCuteNotificationSound();
@@ -446,321 +467,481 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-b from-white via-sky-50/60 to-blue-100/40 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative"
+      className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white pb-20 relative"
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
-      {/* TAMPILKAN EFEK LOADER LOGO GKPI JIKA MASIH LOADING */}
-      {isLoading && <GKPILoader progress={loadProgress} />}
+      {isLoading && <GKPILoader />}
 
-      <div>
-        <header className="pt-10 pb-8 px-4 text-center max-w-2xl mx-auto relative overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl pointer-events-none"></div>
-
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100/90 border border-blue-200 text-blue-900 text-xs font-bold uppercase tracking-widest mb-4 shadow-sm backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            Gereja GKPI Immanuel Resort Tanjung Mulia
-          </div>
-
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-blue-950 tracking-tight leading-tight uppercase font-sans drop-shadow-sm">
-            Jadwal Latihan Natal
-          </h1>
-          <h2 className="text-base sm:text-xl font-bold text-blue-700 uppercase tracking-widest mt-1">
-            Pemuda – Pemudi GKPI Immanuel
-          </h2>
-
-          <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto font-medium">
-            11 Oktober 2026 – 18 Desember 2026 &bull; Gereja GKPI Immanuel, Jl. Tanjung Mulia, Medan
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-            <div className="flex flex-wrap items-center justify-center bg-white/95 backdrop-blur-md rounded-2xl p-1.5 border border-blue-200/90 shadow-md text-xs font-semibold">
-              <span className="px-2 text-slate-500 flex items-center gap-1 font-medium">
-                <Filter className="w-3.5 h-3.5 text-blue-600" /> Hari:
-              </span>
-              {['SEMUA', 'MINGGU', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'].map((day) => (
-                <button
-                  key={day}
-                  onClick={() => setFilterDay(day)}
-                  className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${filterDay === day
-                    ? 'bg-blue-800 text-white shadow-md font-bold'
-                    : 'text-slate-600 hover:text-blue-900 hover:bg-slate-100'
-                    }`}
-                >
-                  {day}
-                </button>
-              ))}
+      {/* HEADER UTAMA */}
+      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3.5">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-sm shadow-blue-500/20 font-bold">
+              <CrossIcon />
             </div>
-
-            <div className="flex items-center bg-white/95 backdrop-blur-md rounded-2xl p-1.5 border border-blue-200/90 shadow-md text-xs font-semibold">
-              <span className="px-2 text-slate-500 font-medium">Bulan:</span>
-              {['SEMUA', 'Oktober', 'November', 'Desember'].map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setFilterMonth(m)}
-                  className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${filterMonth === m
-                    ? 'bg-[#C2F215] text-slate-950 shadow-md font-extrabold'
-                    : 'text-slate-600 hover:text-blue-900 hover:bg-slate-100'
-                    }`}
-                >
-                  {m === 'SEMUA' ? 'Semua' : m.substring(0, 3)}
-                </button>
-              ))}
+            <div>
+              <h1 className="text-sm font-extrabold text-slate-900 leading-tight uppercase tracking-wide">
+                GKPI IMMANUEL
+              </h1>
+              <p className="text-[11px] font-semibold text-blue-600">
+                Resort Tanjung Mulia &bull; Medan
+              </p>
             </div>
           </div>
-        </header>
 
-        <main className="max-w-2xl mx-auto px-4 pb-16 space-y-3.5">
-          {filteredSchedule.length === 0 ? (
-            <div className="bg-white rounded-3xl p-8 text-center text-slate-500 border border-blue-200/80 shadow-md font-medium">
-              Tidak ada jadwal latihan sesuai filter ini.
+          <button
+            onClick={() => setShowNotice(true)}
+            className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 transition-colors text-slate-700"
+            title="Pemberitahuan Latihan"
+          >
+            <Bell className="w-5 h-5" />
+            {nextSchedule && (
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white animate-pulse"></span>
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* KONTEN UTAMA */}
+      <main className="max-w-md mx-auto px-4 pt-4 w-full flex-1">
+        {/* TAB 1: BERANDA */}
+        {activeTab === 'home' && (
+          <div className="space-y-4">
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/15 relative overflow-hidden">
+              <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+              <div className="flex items-center gap-2 text-blue-100 text-xs font-semibold mb-2">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Shalom, Pemuda-Pemudi!</span>
+              </div>
+              <h2 className="text-lg font-bold leading-snug">
+                Jadwal & Info Latihan Natal 2026
+              </h2>
+              <p className="text-xs text-blue-100/90 mt-1 font-normal">
+                Persiapkan pelayanan terbaik kita untuk menyambut hari kelahiran Sang Juruselamat.
+              </p>
             </div>
-          ) : (
-            filteredSchedule.map((item) => {
+
+            {nextSchedule && (
+              <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                  <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" /> LATIHAN TERDEKAT
+                  </span>
+                  <span className="bg-rose-100 text-rose-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
+                    {daysRemaining === 0 ? 'HARI INI' : `${daysRemaining} Hari Lagi`}
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-extrabold text-slate-900 text-base">
+                      {nextSchedule.day}, {nextSchedule.date}
+                    </h3>
+                  </div>
+                  <p className="text-xs font-semibold text-blue-600 flex items-center gap-1">
+                    <Music className="w-3.5 h-3.5" /> {nextSchedule.activity}
+                  </p>
+                  <p className="text-xs text-slate-500 flex items-center gap-1 pt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" /> {nextSchedule.location} &bull; Jam {nextSchedule.time}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setSelectedSchedule(nextSchedule)}
+                  className="w-full bg-slate-100 hover:bg-slate-200/80 text-slate-800 font-bold text-xs py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 mt-1"
+                >
+                  <Utensils className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Lihat Info Konsumsi</span>
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setActiveTab('schedule')}
+                className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm text-left hover:border-blue-300 transition-all group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
+                  <CalendarDays className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-xs text-slate-900">Semua Jadwal</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">22 Agenda latihan</p>
+              </button>
+
+              <button
+                onClick={handleAccountTabClick}
+                className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm text-left hover:border-blue-300 transition-all group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
+                  <User className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-xs text-slate-900">Dokumentasi</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  {isLoggedIn ? 'Akses langsung' : 'Login untuk akses'}
+                </p>
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm space-y-2">
+              <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Catatan Penting Panitia
+              </h4>
+              <ul className="text-xs text-slate-600 space-y-1.5 pl-5 list-disc font-medium">
+                <li>Harap hadir 10 menit sebelum jam latihan dimulai.</li>
+                <li>Air mineral Clean Q disediakan gratis oleh panitia setiap latihan.</li>
+                <li>Jadwal dengan tanda khusus menyajikan Roti & Bandrek Hangat!</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: JADWAL LENGKAP */}
+        {activeTab === 'schedule' && (
+          <div className="space-y-3.5">
+            <div className="bg-white rounded-2xl p-3 border border-slate-200/90 shadow-sm space-y-2.5">
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+                <span className="text-slate-400 shrink-0 text-[11px] font-bold mr-1 flex items-center gap-1">
+                  <Filter className="w-3 h-3" /> Hari:
+                </span>
+                {['SEMUA', 'MINGGU', 'JUMAT', 'SENIN', 'KAMIS'].map((day) => (
+                  <button
+                    key={day}
+                    onClick={() => setFilterDay(day)}
+                    className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all ${filterDay === day
+                      ? 'bg-blue-600 text-white font-bold shadow-sm'
+                      : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-1 overflow-x-auto text-xs font-semibold pt-1 border-t border-slate-100">
+                <span className="text-slate-400 shrink-0 text-[11px] font-bold mr-1">Bulan:</span>
+                {['SEMUA', 'Oktober', 'November', 'Desember'].map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setFilterMonth(m)}
+                    className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all ${filterMonth === m
+                      ? 'bg-slate-900 text-white font-bold shadow-sm'
+                      : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filteredSchedule.map((item) => {
               const isSunday = item.day === 'MINGGU';
 
               return (
                 <div
                   key={item.id}
-                  className="group relative bg-gradient-to-r from-[#0a2752] via-[#0d346c] to-[#071f42] rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-900/40 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-white"
+                  className="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-sm hover:border-blue-300 transition-all flex items-center justify-between gap-3"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl sm:rounded-3xl"></div>
-
-                  <div className="flex items-center gap-3.5 min-w-0 flex-1 z-10">
-                    <div className="bg-[#C2F215] text-slate-950 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md flex flex-col items-center justify-center min-w-[82px] text-center border border-lime-300 transform group-hover:scale-105 transition-transform duration-200 shrink-0">
-                      <span>{item.day}</span>
-                      <span className="text-[10px] opacity-80 font-semibold font-sans mt-0.5">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="bg-blue-50 text-blue-700 px-3 py-2 rounded-xl font-black text-xs uppercase tracking-wider flex flex-col items-center justify-center min-w-[70px] text-center border border-blue-100 shrink-0">
+                      <span>{item.day.split(' ')[0]}</span>
+                      <span className="text-[10px] text-blue-500 font-semibold mt-0.5">
                         {isSunday ? '14.00' : item.day === 'JUMAT' ? '18.30' : '19.00'}
                       </span>
                     </div>
 
-                    <div className="space-y-0.5 min-w-0 flex-1 pr-1">
-                      <div className="text-[10px] text-cyan-300 uppercase font-bold tracking-widest flex items-center gap-1">
-                        <CalendarDays className="w-3 h-3 text-cyan-400 shrink-0" />
-                        TANGGAL
-                      </div>
-                      <div className="font-bold text-sm sm:text-base text-white tracking-wide font-sans truncate">
+                    <div className="space-y-0.5 min-w-0 flex-1">
+                      <div className="font-bold text-xs text-slate-900 truncate">
                         {item.date}
                       </div>
-                      <div className="text-[11px] sm:text-xs text-[#C2F215] font-semibold flex items-start gap-1.5 leading-tight pt-0.5 break-words">
-                        <Music className="w-3.5 h-3.5 text-[#C2F215] shrink-0 mt-0.5" />
-                        <span className="line-clamp-2">{item.activity}</span>
+                      <div className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 truncate">
+                        <Music className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{item.activity}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-medium">
+                        {item.time} &bull; {item.location}
                       </div>
                     </div>
                   </div>
 
-                  <div className="hidden sm:flex flex-col items-center justify-center space-y-0.5 px-3 shrink-0 z-10 border-x border-blue-700/40">
-                    <div className="text-[10px] text-blue-300 uppercase font-bold tracking-widest flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-cyan-400" />
-                      JAM
-                    </div>
-                    <div className="font-semibold text-xs sm:text-sm text-cyan-100">
-                      {item.time}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-end w-full sm:w-auto ml-auto shrink-0 z-10">
-                    <button
-                      onClick={() => setSelectedSchedule(item)}
-                      className="bg-white hover:bg-[#C2F215] text-[#082247] hover:text-slate-950 font-black text-xs px-4 py-2.5 rounded-2xl uppercase tracking-wider transition-all duration-200 shadow-md hover:shadow-cyan-500/20 active:scale-95 flex items-center gap-2 shrink-0 border border-white/20"
-                    >
-                      <Utensils className="w-3.5 h-3.5" />
-                      <span>KONSUMSI</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setSelectedSchedule(item)}
+                    className="bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 font-bold text-[11px] px-3 py-2 rounded-xl uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0"
+                  >
+                    <Utensils className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">KONSUMSI</span>
+                  </button>
                 </div>
               );
-            })
-          )}
-        </main>
-      </div>
+            })}
+          </div>
+        )}
 
-      <footer className="bg-gradient-to-r from-[#061833] via-[#0b2b5c] to-[#061833] text-white text-center py-5 px-4 font-black text-xs sm:text-sm uppercase tracking-widest border-t-2 border-[#C2F215] shadow-2xl relative z-10">
-        SELAMAT LATIHAN PEMUDA PEMUDI GKPI IMMANUEL
-      </footer>
-
-      {/* POPUP NOTIFIKASI JADWAL TERDEKAT DINAMIS */}
-      {!isLoading && showNotice && nextSchedule && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
-          <div className="bg-slate-900 border border-blue-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
-
-            <div className="absolute -top-12 -left-12 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
-            <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[#C2F215]/10 rounded-full blur-2xl pointer-events-none"></div>
-
-            <div className="flex flex-col items-center gap-2">
-              <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 text-white">
-                  <Bell className="w-7 h-7 animate-bounce" />
-                </div>
-                <button
-                  onClick={playCuteNotificationSound}
-                  title="Putar Suara Notifikasi"
-                  className="absolute -top-1 -right-1 bg-[#C2F215] text-slate-950 p-1 rounded-full shadow-md hover:scale-110 transition-transform"
-                >
-                  <Volume2 className="w-3.5 h-3.5" />
-                </button>
+        {/* TAB 3: AKUN SAYA */}
+        {activeTab === 'account' && (
+          <div className="space-y-4">
+            <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm text-center space-y-3">
+              <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-black shadow-md shadow-blue-500/20 border-4 border-slate-50">
+                P
               </div>
-
-              {/* STATUS HARI HITUNG MUNDUR */}
-              <div className="inline-block bg-blue-900/60 border border-blue-400/30 px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 uppercase tracking-widest mt-1">
-                {daysRemaining === 0 && 'HARI INI BGT!'}
-                {daysRemaining === 1 && '⏰ BESOK LATIHAN!'}
-                {daysRemaining > 1 && `⏳ ${daysRemaining} HARI LAGI`}
+              <div>
+                <h3 className="font-extrabold text-base text-slate-900">Pemuda - Pemudi GKPI Immanuel</h3>
+                <p className="text-xs text-slate-500 font-medium">Anggota Sektor Pemuda-Pemudi</p>
+                <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-3 py-0.5 rounded-full mt-1.5">
+                  ✓ Terautentikasi (Sesi Aktif)
+                </span>
               </div>
+            </div>
 
-              <h3 className="font-extrabold text-lg text-white tracking-wide uppercase">
-                PEMBERITAHUAN LATIHAN
+            <div className="bg-gradient-to-br from-indigo-900 to-blue-900 rounded-2xl p-5 text-white shadow-md space-y-3">
+              <div className="flex items-center gap-2 text-amber-300 font-bold text-xs">
+                <Sparkles className="w-4 h-4" /> DOKUMENTASI TERSEDIA
+              </div>
+              <h4 className="font-extrabold text-sm">
+                Akses Galeri & Dokumentasi Natal
+              </h4>
+              <p className="text-xs text-blue-100/80 leading-relaxed">
+                Anda sudah terautentikasi secara permanen. Klik tombol di bawah ini untuk membuka tautan dokumentasi resmi kapan saja.
+              </p>
+              <a
+                href={REDIRECT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md"
+              >
+                <span>Buka Dokumentasi Orcin</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm divide-y divide-slate-100 text-xs font-medium text-slate-700">
+              <div className="p-3.5 flex items-center justify-between">
+                <span className="text-slate-500 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-blue-600" /> Gereja
+                </span>
+                <span className="font-bold text-slate-900">GKPI Immanuel</span>
+              </div>
+              <div className="p-3.5 flex items-center justify-between">
+                <span className="text-slate-500 flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-blue-600" /> Resort
+                </span>
+                <span className="font-bold text-slate-900">Tanjung Mulia - Medan</span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs py-2.5 rounded-xl transition-all"
+            >
+              Keluar / Logout
+            </button>
+          </div>
+        )}
+      </main>
+
+      {/* BOTTOM NAVIGATION BAR */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 py-2 px-6">
+        <div className="max-w-md mx-auto flex items-center justify-around">
+          <button
+            onClick={() => setActiveTab('home')}
+            className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'home' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+              }`}
+          >
+            <Home className="w-5 h-5" />
+            <span className="text-[10px]">Beranda</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('schedule')}
+            className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'schedule' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+              }`}
+          >
+            <Calendar className="w-5 h-5" />
+            <span className="text-[10px]">Jadwal</span>
+          </button>
+
+          <button
+            onClick={handleAccountTabClick}
+            className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'account' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+              }`}
+          >
+            <User className="w-5 h-5" />
+            <span className="text-[10px]">Akun</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* MODAL FORM LOGIN USERNAME & PASSWORD */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-slate-100 space-y-4">
+            <button
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 p-1 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="font-extrabold text-base text-slate-900">
+                LOGIN ANGGOTA PEMUDA
               </h3>
-              <p className="text-xs text-slate-400 font-medium">
-                Hallo teman - teman Pemuda-Pemudi GKPI Immanuel!
+              <p className="text-xs text-slate-500">
+                Gunakan kredensial resmi pemuda untuk masuk.
               </p>
             </div>
 
-            <div className="bg-slate-950/80 border border-blue-800/60 rounded-2xl p-4 text-left space-y-3 shadow-inner">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                <span className="bg-[#C2F215] text-slate-950 font-black text-xs px-3 py-1 rounded-xl shadow-md uppercase">
-                  HARI {nextSchedule.day}
-                </span>
-                <span className="text-cyan-300 font-extrabold text-xs flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                  Jam {nextSchedule.time}
-                </span>
+            {loginError && (
+              <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-xl flex items-center gap-2 font-medium">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleLoginSubmit} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Username</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Masukkan username"
+                  value={usernameInput}
+                  onChange={(e) => setUsernameInput(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-600 font-medium"
+                />
               </div>
 
-              <div className="space-y-2 pt-0.5">
-                <div className="flex items-center gap-2 text-slate-200 text-xs sm:text-sm font-bold">
-                  <Calendar className="w-4 h-4 text-blue-400 shrink-0" />
-                  <span>Tanggal: {nextSchedule.date}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-slate-300 text-xs font-medium">
-                  <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-                  <span>{nextSchedule.location}</span>
-                </div>
-
-                <div className="flex items-start gap-1.5 text-[#C2F215] font-bold bg-lime-400/10 px-2.5 py-1.5 rounded-xl border border-lime-400/20 text-xs leading-snug break-words">
-                  <Sparkles className="w-4 h-4 text-[#C2F215] shrink-0 mt-0.5" />
-                  <span>Kegiatan: {nextSchedule.activity}</span>
-                </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Password</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Masukkan password"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-600 font-medium"
+                />
               </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 mt-2"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Masuk & Buka Dokumentasi</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP NOTIFIKASI DINAMIS */}
+      {!isLoading && showNotice && nextSchedule && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl text-center space-y-4 relative border border-slate-100">
+            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+              <Bell className="w-6 h-6 animate-bounce" />
             </div>
 
-            {/* PESAN NOTIFIKASI SESUAI STATUS HARI */}
-            <p className="text-xs text-slate-300 font-medium leading-relaxed px-1">
-              {daysRemaining === 0 && (
-                <>Hari ini kita ada <strong className="text-[#C2F215]">{nextSchedule.activity}</strong> jam {nextSchedule.time}. Datang tepat waktu dan jangan telat ya! 🎵</>
-              )}
-              {daysRemaining === 1 && (
-                <>Jangan lupa besok hari {nextSchedule.day.toLowerCase()} kita ada <strong className="text-[#C2F215]">{nextSchedule.activity}</strong>. Persiapkan diri kamu! 🎼</>
-              )}
-              {daysRemaining > 1 && (
-                <>Ingat ya, {daysRemaining} hari lagi pada hari {nextSchedule.day.toLowerCase()} ({nextSchedule.date}) kita ada <strong className="text-[#C2F215]">{nextSchedule.activity}</strong>. Jangan sampai terlewat! </>
-              )}
-            </p>
+            <div>
+              <span className="inline-block bg-blue-50 text-blue-700 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider mb-1">
+                {daysRemaining === 0 ? 'HARI INI BGT!' : `${daysRemaining} HARI LAGI`}
+              </span>
+              <h3 className="font-extrabold text-base text-slate-900">
+                PEMBERITAHUAN LATIHAN
+              </h3>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 text-left space-y-2 text-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="font-bold text-blue-600">{nextSchedule.day}</span>
+                <span className="text-slate-500 font-semibold">{nextSchedule.time}</span>
+              </div>
+              <p className="font-bold text-slate-800">{nextSchedule.date}</p>
+              <p className="text-slate-600 flex items-center gap-1">
+                <Music className="w-3.5 h-3.5 text-blue-600" /> {nextSchedule.activity}
+              </p>
+            </div>
 
             <button
               onClick={handleCloseScheduleNotice}
-              className="w-full bg-[#C2F215] hover:bg-lime-400 text-slate-950 font-black text-xs py-3.5 rounded-2xl uppercase tracking-widest transition-all shadow-lg shadow-lime-400/20 active:scale-95"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-blue-500/20"
             >
-              {daysRemaining === 0 ? 'SIAP LATIHAN HARI INI!' : 'OKE, SIAP LATIHAN!'}
+              SIAP LATIHAN!
             </button>
           </div>
         </div>
       )}
 
-      {/* MODAL KONSUMSI */}
+      {/* MODAL DETAIL KONSUMSI */}
       {selectedSchedule && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-200">
-          <div className="bg-slate-900 w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-blue-500/30 max-h-[90vh] flex flex-col text-slate-100">
-
-            <div className="bg-gradient-to-r from-[#082247] via-[#0c2f60] to-[#082247] p-4 text-white flex items-center justify-between border-b border-blue-700/40">
-              <div className="flex items-center gap-3">
-                <span className="bg-[#C2F215] text-slate-950 font-black text-xs px-3 py-1.5 rounded-xl shadow-md">
-                  {selectedSchedule.day}
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-slate-200 text-slate-800">
+            <div className="bg-slate-900 text-white p-4 flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-blue-400 uppercase">
+                  {selectedSchedule.day} &bull; {selectedSchedule.time}
                 </span>
-                <div>
-                  <h3 className="font-extrabold text-sm sm:text-base leading-tight text-white">
-                    {selectedSchedule.date}
-                  </h3>
-                  <p className="text-[11px] text-cyan-300 font-medium mt-0.5 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-cyan-400" />
-                    {selectedSchedule.time} &bull; {selectedSchedule.location}
-                  </p>
-                </div>
+                <h3 className="font-extrabold text-sm text-white">
+                  {selectedSchedule.date}
+                </h3>
               </div>
-
               <button
                 onClick={() => setSelectedSchedule(null)}
-                className="p-2 rounded-full bg-[#0a2752]/60 hover:bg-[#0a2752] text-white transition-colors border border-white/10"
+                className="p-1.5 rounded-full bg-slate-800 text-slate-300 hover:text-white"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-4 text-xs text-slate-200 flex-1">
+            <div className="p-5 space-y-3 text-xs">
               {selectedSchedule.hasSpecialSnack ? (
-                <div className="bg-gradient-to-b from-amber-500/20 via-amber-950/30 to-slate-900 border-2 border-amber-400/50 rounded-2xl p-6 text-center space-y-4 relative overflow-hidden shadow-xl">
-                  <div className="inline-flex items-center justify-center p-3.5 bg-amber-400/20 rounded-full text-amber-300 mb-0.5">
-                    <Sparkles className="w-7 h-7 text-amber-400 animate-pulse" />
-                  </div>
-                  <h4 className="font-extrabold text-amber-300 text-base sm:text-lg tracking-wide">
-                    KONSUMSI SPESIAL HARI INI!
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center space-y-2">
+                  <Sparkles className="w-6 h-6 text-amber-500 mx-auto" />
+                  <h4 className="font-bold text-amber-900 text-sm">
+                    KONSUMSI SPESIAL!
                   </h4>
-                  <p className="text-xs text-amber-100 font-medium">
-                    Panitia Natal menyediakan konsumsi istimewa secara gratis untuk seluruh pemuda-pemudi:
-                  </p>
-
-                  <div className="bg-slate-950/90 border border-amber-400/40 rounded-2xl p-4 font-black text-amber-300 text-sm sm:text-base shadow-inner flex flex-col items-center justify-center gap-2">
-                    <span> MAKAN ROTI & MINUM BANDREK</span>
-                    <span className="text-xs text-[#C2F215] font-semibold flex items-center gap-1">
-                      <Droplets className="w-4 h-4 text-cyan-400" /> + Clean Q Air Mineral
-                    </span>
+                  <div className="bg-white border border-amber-200 rounded-xl p-2.5 font-bold text-amber-800">
+                    MAKAN ROTI & MINUM BANDREK
                   </div>
-
-                  <span className="inline-block text-xs font-extrabold text-slate-950 bg-emerald-400 px-4 py-1.5 rounded-full uppercase shadow-md">
-                    ✓ Gratis Disediakan Panitia Natal
+                  <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-100 px-3 py-0.5 rounded-full">
+                    ✓ Gratis Disediakan Panitia
                   </span>
                 </div>
               ) : (
-                <div className="bg-blue-950/40 border border-blue-800/60 rounded-2xl p-6 text-center space-y-4 shadow-inner">
-                  <div className="w-14 h-14 bg-cyan-500/20 border border-cyan-400/40 rounded-full flex items-center justify-center mx-auto text-cyan-300">
-                    <Droplets className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-cyan-300 text-base sm:text-lg">
-                      💧 KONSUMSI AIR MINERAL (Clean Q)
-                    </h4>
-                    <p className="text-xs text-slate-300 mt-1.5 font-medium leading-relaxed">
-                      {selectedSchedule.snackNote}
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-950/80 border border-blue-900/60 rounded-xl p-3.5 text-cyan-200 text-xs font-semibold">
-                    Gelas / Botol Clean Q Segar Tersedia di Ruang Latihan
-                  </div>
+                <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center space-y-2">
+                  <Droplets className="w-6 h-6 text-blue-600 mx-auto" />
+                  <h4 className="font-bold text-blue-900 text-sm">
+                    AIR MINERAL CLEAN Q
+                  </h4>
+                  <p className="text-slate-600 text-[11px]">
+                    {selectedSchedule.snackNote}
+                  </p>
                 </div>
               )}
-
-              <p className="text-[11px] text-slate-400 text-center italic pt-2">
-                *Harap selalu membuang botol/gelas Clean Q ke tempat sampah Gereja GKPI Immanuel.
-              </p>
             </div>
 
-            <div className="bg-slate-950 p-4 border-t border-blue-900/60 flex items-center justify-between">
-              <span className="text-[11px] text-blue-300/70 font-medium px-2">
-                Panitia Natal GKPI Immanuel
-              </span>
+            <div className="p-3 bg-slate-50 border-t border-slate-100 text-right">
               <button
                 onClick={() => setSelectedSchedule(null)}
-                className="bg-[#C2F215] hover:bg-lime-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl text-xs transition-all shadow-md active:scale-95"
+                className="bg-slate-900 text-white font-bold px-5 py-2 rounded-xl text-xs"
               >
                 Tutup
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }
+
+const CrossIcon = () => (
+  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="10.5" y="3" width="3" height="18" rx="1" />
+    <rect x="4" y="7.5" width="16" height="3" rx="1" />
+  </svg>
+);

@@ -477,7 +477,7 @@ export default function App() {
               <span className="px-2 text-slate-500 flex items-center gap-1 font-medium">
                 <Filter className="w-3.5 h-3.5 text-blue-600" /> Hari:
               </span>
-              {['SEMUA', 'MINGGU', 'SELASA', 'KAMIS', 'JUMAT'].map((day) => (
+              {['SEMUA', 'MINGGU', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'].map((day) => (
                 <button
                   key={day}
                   onClick={() => setFilterDay(day)}
@@ -529,7 +529,7 @@ export default function App() {
                     <div className="bg-[#C2F215] text-slate-950 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md flex flex-col items-center justify-center min-w-[82px] text-center border border-lime-300 transform group-hover:scale-105 transition-transform duration-200 shrink-0">
                       <span>{item.day}</span>
                       <span className="text-[10px] opacity-80 font-semibold font-sans mt-0.5">
-                        {isSunday ? '14.00' : '19.00':'18.30'}
+                        {isSunday ? '14.00' : item.day === 'JUMAT' ? '18.30' : '19.00'}
                       </span>
                     </div>
 

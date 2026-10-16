@@ -529,7 +529,7 @@ export default function App() {
                     <div className="bg-[#C2F215] text-slate-950 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-md flex flex-col items-center justify-center min-w-[82px] text-center border border-lime-300 transform group-hover:scale-105 transition-transform duration-200 shrink-0">
                       <span>{item.day}</span>
                       <span className="text-[10px] opacity-80 font-semibold font-sans mt-0.5">
-                        {isSunday ? '14.00' : '19.00'}
+                        {isSunday ? '14.00' : '19.00':'18.30'}
                       </span>
                     </div>
 

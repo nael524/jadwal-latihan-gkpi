@@ -31,7 +31,7 @@ const SCHEDULE_DATA = [
     id: 2,
     day: 'JUMAT',
     date: '16, Oktober 2026',
-    time: '19.00 Malam',
+    time: '18.30 Malam',
     location: 'Gereja GKPI Immanuel',
     activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,

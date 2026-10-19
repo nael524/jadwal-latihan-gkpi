@@ -51,9 +51,9 @@ const SCHEDULE_DATA = [
     date: '19, Oktober 2026',
     time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Pembagian Kegiatan Natal + Songleader',
+    activity: 'Pembagian Kegiatan Natal + Songleader + Mc',
     hasSpecialSnack: false,
-    snackTitle: 'Air Mineral (Clean Q) + Roti',
+    snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
   },
   {
@@ -295,7 +295,7 @@ const parseScheduleDate = (dateStr) => {
 
 const getDaysDifference = (targetDate) => {
   if (!targetDate) return null;
-  const today = new Date(2026, 9, 16);
+  const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const target = new Date(targetDate);
@@ -364,7 +364,7 @@ const GKPILoader = () => (
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('home'); // 'home', 'schedule', 'account'
+  const [activeTab, setActiveTab] = useState('home');
   const [filterDay, setFilterDay] = useState('SEMUA');
   const [filterMonth, setFilterMonth] = useState('SEMUA');
   const [selectedSchedule, setSelectedSchedule] = useState(null);
@@ -372,7 +372,6 @@ export default function App() {
   const [daysRemaining, setDaysRemaining] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
 
-  // STATE AUTHENTICATION LOGIN DENGAN LOCALSTORAGE persistence
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('gkpi_isLoggedIn') === 'true';
   });
@@ -381,7 +380,6 @@ export default function App() {
   const [passwordInput, setPasswordInput] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  // KREDENSIAL VALIDASI
   const VALID_USERNAME = 'pemuda';
   const VALID_PASSWORD = 'natal2026';
   const REDIRECT_URL = 'https://dokumentasi-orcin.vercel.app/';
@@ -393,12 +391,12 @@ export default function App() {
     document.head.appendChild(link);
 
     const timer = setTimeout(() => {
-      const now = new Date(2026, 9, 16);
-      now.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
       const upcomingSchedule = SCHEDULE_DATA.find((item) => {
         const scheduleDate = parseScheduleDate(item.date);
-        return scheduleDate && scheduleDate >= now;
+        return scheduleDate && scheduleDate >= today;
       });
 
       if (upcomingSchedule) {
@@ -410,6 +408,9 @@ export default function App() {
         setTimeout(() => {
           playCuteNotificationSound();
         }, 400);
+      } else {
+        setNextSchedule(SCHEDULE_DATA[SCHEDULE_DATA.length - 1]);
+        setDaysRemaining(0);
       }
 
       setIsLoading(false);
@@ -435,10 +436,9 @@ export default function App() {
   const handleLoginSubmit = (e) => {
     e.preventDefault();
 
-    // Validasi Username & Password
     if (usernameInput.trim().toLowerCase() === VALID_USERNAME && passwordInput === VALID_PASSWORD) {
       setIsLoggedIn(true);
-      localStorage.setItem('gkpi_isLoggedIn', 'true'); // Simpan status login
+      localStorage.setItem('gkpi_isLoggedIn', 'true');
       setShowLoginModal(false);
       setLoginError('');
       setActiveTab('account');
@@ -450,7 +450,7 @@ export default function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    localStorage.removeItem('gkpi_isLoggedIn'); // Hapus status login saat logout
+    localStorage.removeItem('gkpi_isLoggedIn');
     setActiveTab('home');
   };
 
@@ -685,7 +685,7 @@ export default function App() {
                 P
               </div>
               <div>
-                <h3 className="font-extrabold text-base text-slate-900">Pemuda - Pemudi GKPI Immanuel</h3>
+                <h3 className="font-extrabold text-base text-slate-900">Pemuda GKPI Immanuel</h3>
                 <p className="text-xs text-slate-500 font-medium">Anggota Sektor Pemuda-Pemudi</p>
                 <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-3 py-0.5 rounded-full mt-1.5">
                   ✓ Terautentikasi (Sesi Aktif)

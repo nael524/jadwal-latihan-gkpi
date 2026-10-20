@@ -18,8 +18,12 @@ import {
   LogIn,
   ExternalLink,
   Lock,
-  AlertCircle
+  AlertCircle,
+  BookOpen,
+  Users
 } from 'lucide-react';
+
+const LOGO_GKPI = 'src/assets/LOGO GKPI.png';
 
 const SCHEDULE_DATA = [
   // OKTOBER 2026
@@ -51,9 +55,9 @@ const SCHEDULE_DATA = [
     date: '19, Oktober 2026',
     time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Pembagian Kegiatan Natal + Songleader + Mc',
+    activity: 'Pembagian Kegiatan Natal + Songleader',
     hasSpecialSnack: false,
-    snackTitle: 'Air Mineral (Clean Q)',
+    snackTitle: 'Air Mineral (Clean Q) + Roti',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
   },
   {
@@ -271,6 +275,75 @@ const SCHEDULE_DATA = [
   }
 ];
 
+// DATA PETUGAS KEGIATAN NATAL
+const NATAL_ROLES_DATA = [
+  {
+    title: 'MC (Master of Ceremony)',
+    members: ['Sari', 'Boy / Axel / Doli']
+  },
+  {
+    title: 'PROSESI DAN TARI LILIN',
+    members: ['Cindy', 'May', 'Juli', 'Novi', 'Ketty']
+  },
+  {
+    title: 'PENCIPTAAN (Ayat Alkitab)',
+    members: [
+      'Martin',
+      'Lia Pakpahan',
+      'Natasya',
+      'Lia',
+      'Doli',
+      'Lina',
+      'Misel'
+    ]
+  },
+  {
+    title: 'VOCAL SOLO Penciptaan',
+    members: ['Keti']
+  },
+  {
+    title: 'FRAGMEN',
+    members: [
+      'Roni',
+      'Criston',
+      'Martin',
+      'Timoti',
+      'Tasya',
+      'Lia Sianturi'
+    ]
+  },
+  {
+    title: 'VOCAL SOLO Fragmen',
+    members: ['Amanda Panjaitan']
+  },
+  {
+    title: 'PROFESI PANITIA',
+    members: [
+      'Fiktor (Ketua)',
+      'Cino (Wakil)',
+      'Lia Sianturi (Sekretaris)',
+      'Tasya (Bendahara)',
+      'Natanael (Seksi Acara)',
+      'Amanda (Penerima Tamu)',
+      'Muti (Konsumsi)',
+      'Axel / Boy (Humas)',
+      'Timoti (Keamanan)'
+    ]
+  },
+  {
+    title: 'PEMBAWA PERSEMBAHAN',
+    members: ['Ester', 'Lia Pakpahan', 'Roni', 'Kriston', 'Cia']
+  },
+  {
+    title: 'OPERATOR Lampu',
+    members: ['Axel']
+  },
+  {
+    title: 'INFOKUS',
+    members: ['Wiki', 'Jona']
+  }
+];
+
 const parseScheduleDate = (dateStr) => {
   if (!dateStr || dateStr === 'STAY TUNED') return null;
 
@@ -341,13 +414,13 @@ const GKPILoader = () => (
   <div className="fixed inset-0 bg-white text-slate-900 z-50 flex flex-col items-center justify-center p-4 font-sans">
     <div className="relative flex flex-col items-center max-w-sm w-full text-center space-y-6">
       <div className="relative flex items-center justify-center">
-        <div className="w-24 h-24 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
-        <div className="absolute w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-          <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="10.5" y="3" width="3" height="18" rx="1.5" />
-            <rect x="4" y="7.5" width="16" height="3" rx="1.5" />
-            <path d="M12 2L13.5 5H10.5L12 2Z" fill="#93C5FD" />
-          </svg>
+        <div className="w-28 h-28 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+        <div className="absolute w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 p-2">
+          <img
+            src={LOGO_GKPI}
+            alt="Logo GKPI"
+            className="w-full h-full object-contain drop-shadow-md animate-pulse"
+          />
         </div>
       </div>
       <div className="space-y-1">
@@ -476,8 +549,8 @@ export default function App() {
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3.5">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-sm shadow-blue-500/20 font-bold">
-              <CrossIcon />
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1 shadow-sm border border-slate-100">
+              <img src={LOGO_GKPI} alt="Logo GKPI" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-sm font-extrabold text-slate-900 leading-tight uppercase tracking-wide">
@@ -569,16 +642,14 @@ export default function App() {
               </button>
 
               <button
-                onClick={handleAccountTabClick}
+                onClick={() => setActiveTab('roles')}
                 className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm text-left hover:border-blue-300 transition-all group"
               >
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
-                  <User className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
+                  <BookOpen className="w-5 h-5" />
                 </div>
-                <h4 className="font-bold text-xs text-slate-900">Dokumentasi</h4>
-                <p className="text-[10px] text-slate-500 mt-0.5">
-                  {isLoggedIn ? 'Akses langsung' : 'Login untuk akses'}
-                </p>
+                <h4 className="font-bold text-xs text-slate-900">Kegiatan Natal</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">Petugas & Liturgi</p>
               </button>
             </div>
 
@@ -677,12 +748,57 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 3: AKUN SAYA */}
+        {/* TAB KEGIATAN NATAL & TUGAS LITURGI */}
+        {activeTab === 'roles' && (
+          <div className="space-y-3.5">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-4 text-white shadow-md space-y-1">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-100 uppercase tracking-wider">
+                <BookOpen className="w-4 h-4 text-white" /> SUSUNAN & PETUGAS NATAL
+              </div>
+              <h3 className="font-extrabold text-base">Pembagian Kegiatan Pemuda</h3>
+              <p className="text-[11px] text-amber-100/90 font-medium">
+                Daftar nama liturgi, fragmen, solo, dan struktur panitia Natal.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {NATAL_ROLES_DATA.map((role, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm space-y-2.5"
+                >
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <h4 className="font-extrabold text-xs text-blue-900 uppercase tracking-wide flex items-center gap-2">
+                      <Users className="w-3.5 h-3.5 text-blue-600" />
+                      {role.title}
+                    </h4>
+                    <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                      {role.members.length} Orang/Bagian
+                    </span>
+                  </div>
+
+                  <ul className="space-y-1.5">
+                    {role.members.map((member, mIdx) => (
+                      <li
+                        key={mIdx}
+                        className="text-xs text-slate-700 font-semibold bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 flex items-center justify-between"
+                      >
+                        <span>{member}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: AKUN SAYA */}
         {activeTab === 'account' && (
           <div className="space-y-4">
             <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm text-center space-y-3">
-              <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-black shadow-md shadow-blue-500/20 border-4 border-slate-50">
-                P
+              <div className="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center p-3 shadow-md border-4 border-slate-50">
+                <img src={LOGO_GKPI} alt="Logo GKPI" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h3 className="font-extrabold text-base text-slate-900">Pemuda GKPI Immanuel</h3>
@@ -740,7 +856,7 @@ export default function App() {
       </main>
 
       {/* BOTTOM NAVIGATION BAR */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 py-2 px-6">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 py-2 px-4">
         <div className="max-w-md mx-auto flex items-center justify-around">
           <button
             onClick={() => setActiveTab('home')}
@@ -758,6 +874,15 @@ export default function App() {
           >
             <Calendar className="w-5 h-5" />
             <span className="text-[10px]">Jadwal</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('roles')}
+            className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'roles' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+              }`}
+          >
+            <BookOpen className="w-5 h-5" />
+            <span className="text-[10px]">Kegiatan</span>
           </button>
 
           <button
@@ -783,8 +908,8 @@ export default function App() {
             </button>
 
             <div className="text-center space-y-2">
-              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
-                <Lock className="w-6 h-6" />
+              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto p-1.5 shadow-md border border-slate-100">
+                <img src={LOGO_GKPI} alt="Logo GKPI" className="w-full h-full object-contain" />
               </div>
               <h3 className="font-extrabold text-base text-slate-900">
                 LOGIN ANGGOTA PEMUDA
@@ -938,10 +1063,3 @@ export default function App() {
     </div>
   );
 }
-
-const CrossIcon = () => (
-  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-    <rect x="10.5" y="3" width="3" height="18" rx="1" />
-    <rect x="4" y="7.5" width="16" height="3" rx="1" />
-  </svg>
-);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import logo from './assets/LOGO GKPI.png';
 import {
   Clock,
   Utensils,
@@ -23,7 +24,6 @@ import {
   Users
 } from 'lucide-react';
 
-const LOGO_GKPI = 'src/assets/LOGO GKPI.png';
 
 const SCHEDULE_DATA = [
   // OKTOBER 2026
@@ -417,7 +417,7 @@ const GKPILoader = () => (
         <div className="w-28 h-28 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
         <div className="absolute w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 p-2">
           <img
-            src={LOGO_GKPI}
+            src={logo}
             alt="Logo GKPI"
             className="w-full h-full object-contain drop-shadow-md animate-pulse"
           />
@@ -550,7 +550,7 @@ export default function App() {
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1 shadow-sm border border-slate-100">
-              <img src={LOGO_GKPI} alt="Logo GKPI" className="w-full h-full object-contain" />
+              <img src={logo} alt="Logo GKPI" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-sm font-extrabold text-slate-900 leading-tight uppercase tracking-wide">
@@ -798,7 +798,7 @@ export default function App() {
           <div className="space-y-4">
             <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm text-center space-y-3">
               <div className="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center p-3 shadow-md border-4 border-slate-50">
-                <img src={LOGO_GKPI} alt="Logo GKPI" className="w-full h-full object-contain" />
+                <img src={logo} alt="Logo GKPI" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h3 className="font-extrabold text-base text-slate-900">Pemuda GKPI Immanuel</h3>
@@ -909,7 +909,7 @@ export default function App() {
 
             <div className="text-center space-y-2">
               <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto p-1.5 shadow-md border border-slate-100">
-                <img src={LOGO_GKPI} alt="Logo GKPI" className="w-full h-full object-contain" />
+                <img src={logo} alt="Logo GKPI" className="w-full h-full object-contain" />
               </div>
               <h3 className="font-extrabold text-base text-slate-900">
                 LOGIN ANGGOTA PEMUDA

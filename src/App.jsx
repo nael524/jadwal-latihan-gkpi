@@ -62,12 +62,12 @@ const SCHEDULE_DATA = [
   },
   {
     id: 4,
-    day: 'STAY TUNED',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
+    day: 'SELASA',
+    date: '20, Oktober 2026',
+    time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
     activity: 'Latihan Koor Natal',
-    hasSpecialSnack: true,
+    hasSpecialSnack: false,
     snackTitle: 'Air Mineral + Roti',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   },

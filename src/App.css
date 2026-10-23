@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+@layer base {
+    * {
+        font-family: 'Poppins', sans-serif !important;
+    }
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8fafc;
+    /* bg-slate-50 */
+    color: #0f172a;
+    /* text-slate-900 */
+}

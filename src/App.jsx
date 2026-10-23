@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import logo from './assets/LOGO GKPI.png';
+import AttendancePage from './pages/AttendancePage';
 import {
   Clock,
   Utensils,
@@ -18,12 +19,11 @@ import {
   ShieldCheck,
   LogIn,
   ExternalLink,
-  Lock,
   AlertCircle,
   BookOpen,
-  Users
+  Users,
+  UserCheck
 } from 'lucide-react';
-
 
 const SCHEDULE_DATA = [
   // OKTOBER 2026
@@ -74,7 +74,7 @@ const SCHEDULE_DATA = [
   {
     id: 5,
     day: 'SABTU',
-    date: '23, Oktober 2026',
+    date: '24, Oktober 2026',
     time: '20.00 Malam',
     location: 'Gereja GKPI Immanuel',
     activity: 'Liturgi Penciptaan + Latihan Fragmen + Prosesi + Songleader + Mc',
@@ -85,10 +85,10 @@ const SCHEDULE_DATA = [
   {
     id: 6,
     day: 'MINGGU',
-    date: '24, Oktober 2026',
+    date: '25, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Koor Natal',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -515,7 +515,6 @@ export default function App() {
       setShowLoginModal(false);
       setLoginError('');
       setActiveTab('account');
-      window.open(REDIRECT_URL, '_blank');
     } else {
       setLoginError('Username atau password salah! Coba periksa kembali.');
     }
@@ -538,10 +537,19 @@ export default function App() {
     return matchDay && matchMonth;
   });
 
+  if (activeTab === 'attendance_page') {
+    return (
+      <AttendancePage
+        scheduleData={SCHEDULE_DATA}
+        onBack={() => setActiveTab('account')}
+      />
+    );
+  }
+
   return (
     <div
       className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white pb-20 relative"
-      style={{ fontFamily: "'Poppins', sans-serif" }}
+
     >
       {isLoading && <GKPILoader />}
 
@@ -809,6 +817,27 @@ export default function App() {
               </div>
             </div>
 
+            {/* KARTU MENU MASUK PAGE ABSENSI */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg space-y-3">
+              <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
+                <UserCheck className="w-4 h-4" /> SISTEM ABSENSI PEMUDA
+              </div>
+              <h4 className="font-extrabold text-sm">
+                Kelola & Finalisasi Presensi
+              </h4>
+              <p className="text-xs text-blue-100/90 leading-relaxed">
+                Buka halaman khusus absensi dengan dropdown status per anggota, fitur Hadir Semua, pencarian, dan submit otomatis ke Supabase.
+              </p>
+
+              <button
+                onClick={() => setActiveTab('attendance_page')}
+                className="w-full bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 mt-2"
+              >
+                <UserCheck className="w-4 h-4 text-blue-600" />
+                <span>BUKA HALAMAN ABSENSI</span>
+              </button>
+            </div>
+
             <div className="bg-gradient-to-br from-indigo-900 to-blue-900 rounded-2xl p-5 text-white shadow-md space-y-3">
               <div className="flex items-center gap-2 text-amber-300 font-bold text-xs">
                 <Sparkles className="w-4 h-4" /> DOKUMENTASI TERSEDIA
@@ -825,7 +854,7 @@ export default function App() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md"
               >
-                <span>Buka Dokumentasi Orcin</span>
+                <span>Buka Dokumentasi</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
             </div>

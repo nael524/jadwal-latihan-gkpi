@@ -88,7 +88,7 @@ const SCHEDULE_DATA = [
     date: '25, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Kegiatan Natal',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'

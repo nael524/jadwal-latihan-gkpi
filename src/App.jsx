@@ -33,7 +33,7 @@ const SCHEDULE_DATA = [
     date: '11, Oktober 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Koor Natal,Songleader dan Mc',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
@@ -55,7 +55,7 @@ const SCHEDULE_DATA = [
     date: '19, Oktober 2026',
     time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Pembagian Kegiatan Natal + Songleader',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q) + Roti',
     snackNote: 'Disediakan Air Mineral Clean Q oleh Panitia'
@@ -77,7 +77,7 @@ const SCHEDULE_DATA = [
     date: '24, Oktober 2026',
     time: '20.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Liturgi Penciptaan + Latihan Fragmen + Prosesi + Songleader + Mc',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
     snackTitle: 'Makan Roti & Minum Bandrek',
     snackNote: 'Spesial Minggu Ketiga: Makan Roti & Bandrek Panas + Clean Q'
@@ -101,7 +101,7 @@ const SCHEDULE_DATA = [
     date: '31, Oktober 2026',
     time: '20.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Kegiatan Natal (Songleader, Mc, Fragmen, Prosesi,Liturgi, Solo)',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'

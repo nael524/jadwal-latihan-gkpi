@@ -108,11 +108,11 @@ const SCHEDULE_DATA = [
   },
   {
     id: 8,
-    day: 'STAY TUNED',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
+    day: 'MINGGU',
+    date: '01, November 2026',
+    time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
-    activity: 'STAY TUNED',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -257,7 +257,7 @@ const SCHEDULE_DATA = [
     date: '17, Desember 2026',
     time: '18.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Gladi Bersama Pra-Natal',
+    activity: 'PRA JR (ALL)',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -268,7 +268,7 @@ const SCHEDULE_DATA = [
     date: '18, Desember 2026',
     time: '18.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Perayaan Natal Pemuda',
+    activity: 'JR (ALL)',
     hasSpecialSnack: true,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'

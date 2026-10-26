@@ -318,6 +318,13 @@ const NATAL_ROLES_DATA = [
   }, {
     title: 'VOCAL SOLO Kelahiran Yesus',
     members: ['Annisa Simanungkalit']
+  }, {
+    title: 'Janji Keselamatan',
+    members: ['Roni', 'Axsel', 'Cia', 'Timoti', 'Juli', 'Lina Panjaitan', 'Martin']
+  },
+  {
+    title: 'Litugri Kelahiran',
+    members: ['Ketty', 'Annisa Simanungkalit']
   },
 
   {
@@ -326,11 +333,11 @@ const NATAL_ROLES_DATA = [
   },
   {
     title: 'OPERATOR Lampu',
-    members: ['Axel']
+    members: ['Axel', 'Jona']
   },
   {
     title: 'INFOKUS',
-    members: ['Wiki', 'Jona']
+    members: ['Wiki']
   }
 ];
 

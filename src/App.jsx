@@ -94,7 +94,6 @@ const SCHEDULE_DATA = [
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   },
 
-  // NOVEMBER 2026
   {
     id: 7,
     day: 'SABTU',
@@ -119,22 +118,22 @@ const SCHEDULE_DATA = [
   },
   {
     id: 9,
-    day: 'SABTU',
-    date: '7 November 2026',
-    time: '20.00 Malam',
+    day: 'RABU',
+    date: '4 November 2026',
+    time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Kegiatan Natal',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Spesial Hari Ini: Makan Roti & Bandrek Panas (Gratis) + Clean Q'
   },
   {
     id: 10,
-    day: 'STAY TUNED',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
+    day: 'SABTU',
+    date: '7 November ',
+    time: '20.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'STAY TUNED',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'

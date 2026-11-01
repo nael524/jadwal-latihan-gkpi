@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import logo from './assets/LOGO GKPI.png';
-import AttendancePage from './pages/AttendancePage';
+import logo from "../src/assets/Logo.png";
+import AttendancePage from './assets/pages/AttendancePage';
 import {
   Clock,
   Utensils,

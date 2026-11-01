@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import logo from '../assets/LOGO GKPI.png';
-import { supabase } from '../supabaseClient';
+import logo from '../Logo.png';
+import { supabase } from '../../supabaseClient';
 import {
     UserCheck,
     CheckCircle2,
@@ -71,7 +71,6 @@ const MEMBERS_BY_CATEGORY = {
     ]
 };
 
-// Menggabungkan seluruh anggota unik dari kedua kategori untuk tabel Rekap Global
 const ALL_UNIQUE_MEMBERS = (() => {
     const combined = [
         ...MEMBERS_BY_CATEGORY['Latihan Koor Natal'],
@@ -105,7 +104,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
 
     const selectedScheduleObj = scheduleData.find((s) => s.id === selectedScheduleId);
 
-    // 1. Memuat data presensi harian sesuai jadwal kegiatan yang dipilih
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
@@ -152,18 +150,15 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
         if (activeTab === 'input') loadData();
     }, [selectedScheduleId, selectedScheduleObj, activeTab]);
 
-    // 2. Memuat data rekapitulasi GLOBAL (Menampilkan SELURUH anggota dari semua input kegiatan)
     useEffect(() => {
         const fetchRekap = async () => {
             if (activeTab !== 'rekap') return;
             setIsRekapLoading(true);
             try {
-                // Tarik seluruh detail kehadiran dari Supabase tanpa filter jadwal
                 const { data: allAttDetails } = await supabase
                     .from('attendance_details')
                     .select('member_id, status');
 
-                // Hitung kumulasi presensi untuk setiap anggota unik
                 const summary = ALL_UNIQUE_MEMBERS.map((m) => {
                     const records = (allAttDetails || []).filter((d) => String(d.member_id) === String(m.id));
                     const hadir = records.filter((d) => d.status === 'Hadir').length;
@@ -186,7 +181,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
         fetchRekap();
     }, [activeTab]);
 
-    // Fungsi Akses Cepat Presensi
     const handleSetAllStatus = (targetStatus) => {
         const updatedMap = {};
         members.forEach((m) => {
@@ -260,7 +254,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between pb-8 font-sans">
-            {/* HEADER MOBILE */}
             <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-xs">
                 <button
                     onClick={onBack}
@@ -277,7 +270,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                 </div>
             </header>
 
-            {/* TAB NAVIGASI */}
             <div className="px-4 pt-3">
                 <div className="flex bg-slate-200/70 p-1 rounded-xl">
                     <button
@@ -295,11 +287,9 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                 </div>
             </div>
 
-            {/* MAIN CONTENT */}
             <main className="px-4 pt-3 flex-1 space-y-3">
                 {activeTab === 'input' ? (
                     <>
-                        {/* CARD JADWAL */}
                         <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-extrabold text-slate-700 flex items-center gap-1.5">
@@ -320,15 +310,18 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                                 onChange={(e) => setSelectedScheduleId(Number(e.target.value))}
                                 className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer"
                             >
-                                {scheduleData.map((s) => (
-                                    <option key={s.id} value={s.id}>
-                                        [{s.day}] {s.activity}
-                                    </option>
-                                ))}
+                                {scheduleData.map((s) => {
+                                    // Hanya tampilkan tanggal jika ada dan bukan "STAY TUNED"
+                                    const displayDate = s.date && s.date !== 'STAY TUNED' ? `, ${s.date}` : '';
+                                    return (
+                                        <option key={s.id} value={s.id}>
+                                            [{s.day}{displayDate}] {s.activity}
+                                        </option>
+                                    );
+                                })}
                             </select>
                         </div>
 
-                        {/* AKSES CEPAT & PENCARIAN */}
                         <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2.5">
                             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                                 <span className="text-[11px] font-bold text-slate-500 uppercase">Akses Cepat</span>
@@ -360,7 +353,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                             </div>
                         </div>
 
-                        {/* LIST DAFTAR ANGGOTA */}
                         <div className="space-y-2">
                             {isLoading ? (
                                 <div className="text-center py-8 text-xs text-slate-400 font-semibold flex items-center justify-center gap-2">
@@ -391,7 +383,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                             )}
                         </div>
 
-                        {/* BUTTON SIMPAN FINALISASI */}
                         <button
                             onClick={handleSave}
                             disabled={isSubmitting || isLoading}
@@ -403,7 +394,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                         </button>
                     </>
                 ) : (
-                    /* REKAP TABEL AKUMULASI GABUNGAN SELURUH NAMA ANGGOTA */
                     <div className="space-y-3">
                         <div className="relative">
                             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -449,7 +439,6 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                 )}
             </main>
 
-            {/* MODAL BERHASIL DISIMPAN */}
             {showSuccessModal && (
                 <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
                     <div className="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl text-center space-y-3 relative border border-slate-100">

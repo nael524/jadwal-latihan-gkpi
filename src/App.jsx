@@ -119,13 +119,13 @@ const SCHEDULE_DATA = [
   },
   {
     id: 9,
-    day: 'STAY TUNED',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
+    day: 'SABTU',
+    date: '7 November 2026',
+    time: '20.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'STAY TUNED',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
-    snackTitle: 'Makan Roti & Minum Bandrek',
+    snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Spesial Hari Ini: Makan Roti & Bandrek Panas (Gratis) + Clean Q'
   },
   {

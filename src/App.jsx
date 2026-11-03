@@ -118,8 +118,8 @@ const SCHEDULE_DATA = [
   },
   {
     id: 9,
-    day: 'RABU',
-    date: '4 November 2026',
+    day: 'JUMAT',
+    date: '6 November 2026',
     time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
     activity: 'Latihan Koor Natal',

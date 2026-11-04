@@ -22,7 +22,9 @@ import {
   AlertCircle,
   BookOpen,
   Users,
-  UserCheck
+  UserCheck,
+  Wallet,
+  Receipt
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -325,7 +327,6 @@ const NATAL_ROLES_DATA = [
     title: 'Litugri Kelahiran',
     members: ['Ketty', 'Annisa Simanungkalit']
   },
-
   {
     title: 'PEMBAWA PERSEMBAHAN',
     members: ['Ester', 'Lia Pakpahan', 'Roni', 'Kriston', 'Cia']
@@ -339,6 +340,12 @@ const NATAL_ROLES_DATA = [
     members: ['Wiki']
   }
 ];
+
+// DATA SEMENTARA: STATUS UANG NATAL (Silakan edit nama-namanya sesuai aslinya)
+const UANG_NATAL_PAID_DATA = {
+  pemuda: ['Jona', 'Mayka', 'David', 'Rony'],
+  remaja: []
+};
 
 const parseScheduleDate = (dateStr) => {
   if (!dateStr || dateStr === 'STAY TUNED') return null;
@@ -440,6 +447,9 @@ export default function App() {
   const [nextSchedule, setNextSchedule] = useState(null);
   const [daysRemaining, setDaysRemaining] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
+
+  // STATE BARU: Modal Uang Natal
+  const [showUangNatalModal, setShowUangNatalModal] = useState(false);
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('gkpi_isLoggedIn') === 'true';
@@ -544,7 +554,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white pb-20 relative"
+      className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white pb-20 relative font-sans"
     >
       {isLoading && <GKPILoader />}
 
@@ -595,6 +605,34 @@ export default function App() {
               <p className="text-xs text-blue-100/90 mt-1 font-normal">
                 Persiapkan pelayanan terbaik kita untuk menyambut hari kelahiran Sang Juruselamat.
               </p>
+            </div>
+
+            {/* DASHBOARD CARD: UANG NATAL */}
+            <div
+              onClick={() => setShowUangNatalModal(true)}
+              className="bg-gradient-to-br from-blue-600/90 to-sky-400/90 backdrop-blur-md rounded-2xl p-5 text-white shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-[1.02] transition-all relative overflow-hidden group border border-white/30"
+            >
+              <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/20 rounded-full blur-2xl pointer-events-none group-hover:bg-white/30 transition-all"></div>
+
+              <div className="flex items-center justify-between mb-3 relative z-10">
+                <div className="flex items-center gap-2 text-sky-50 text-xs font-extrabold uppercase tracking-wider">
+                  <Wallet className="w-4 h-4 text-white" /> Pembayaran Uang Natal
+                </div>
+                <span className="text-[9px] bg-white/20 hover:bg-white/30 transition-colors px-2.5 py-1 rounded-full font-bold flex items-center gap-1 uppercase tracking-wider backdrop-blur-md border border-white/40">
+                  Cek Lunas <Receipt className="w-3 h-3" />
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 relative z-10">
+                <div className="flex-1 bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
+                  <p className="text-[10px] text-sky-100 font-semibold mb-0.5 uppercase tracking-wide">Pemuda/i</p>
+                  <p className="font-black text-[15px]">Rp 60.000</p>
+                </div>
+                <div className="flex-1 bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
+                  <p className="text-[10px] text-sky-100 font-semibold mb-0.5 uppercase tracking-wide">Remaja</p>
+                  <p className="font-black text-[15px]">Rp 40.000</p>
+                </div>
+              </div>
             </div>
 
             {nextSchedule && (
@@ -670,7 +708,7 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 2: JADWAL LENGKAP (WITH HIGHLIGHT JADWAL TERDEKAT warna biru) */}
+        {/* TAB 2: JADWAL LENGKAP */}
         {activeTab === 'schedule' && (
           <div className="space-y-3.5">
             <div className="bg-white rounded-2xl p-3 border border-slate-200/90 shadow-xs space-y-2.5">
@@ -721,7 +759,7 @@ export default function App() {
                     : 'bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:border-blue-300'
                     }`}
                 >
-                  {/* BADGE JADWAL TERDEKAT JIKA SAMPAI HARI H */}
+                  {/* BADGE JADWAL TERDEKAT */}
                   {isNextUpcoming && (
                     <span className="absolute top-2 right-3 bg-amber-400 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-xs">
                       <Sparkles className="w-3 h-3 text-slate-900" />
@@ -833,7 +871,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* KARTU MENU MASUK PAGE ABSENSI */}
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg space-y-3">
               <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
                 <UserCheck className="w-4 h-4" /> SISTEM ABSENSI PEMUDA
@@ -1042,6 +1079,81 @@ export default function App() {
             >
               SIAP LATIHAN!
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DATA UANG NATAL (LIST YANG SUDAH LUNAS) - GLASSMORPHISM BIRU */}
+      {showUangNatalModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+          <div className="bg-gradient-to-br from-blue-50/90 to-white/90 backdrop-blur-xl w-full max-w-sm rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/50 text-slate-800 flex flex-col max-h-[85vh]">
+            <div className="bg-gradient-to-r from-blue-600/90 to-sky-500/90 backdrop-blur-md text-white p-4 flex items-center justify-between shrink-0 border-b border-white/20">
+              <div className="flex items-center gap-2">
+                <Wallet className="w-5 h-5 text-sky-100" />
+                <h3 className="font-extrabold text-sm uppercase tracking-wide text-white">
+                  Pembayaran Lunas
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowUangNatalModal(false)}
+                className="p-1.5 rounded-full bg-white/20 text-white hover:bg-white/30 backdrop-blur-md cursor-pointer transition-colors border border-white/10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-4 overflow-y-auto space-y-5 bg-transparent">
+              {/* Seksi Pemuda */}
+              <div className="space-y-3 bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-sm">
+                <div className="flex items-center justify-between border-b border-blue-200/50 pb-2">
+                  <div>
+                    <h4 className="font-extrabold text-xs text-blue-900 uppercase">PEMUDA/I</h4>
+                    <p className="text-[10px] text-blue-700 font-semibold">Iuran: Rp 60.000</p>
+                  </div>
+                  <span className="text-[10px] bg-blue-100/80 backdrop-blur-sm text-blue-700 font-black px-2.5 py-1 rounded-full border border-blue-200 shadow-sm">
+                    {UANG_NATAL_PAID_DATA.pemuda.length} Orang
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {UANG_NATAL_PAID_DATA.pemuda.map((name, i) => (
+                    <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-blue-300 hover:bg-white/80 transition-all">
+                      <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                      <span className="truncate">{name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Seksi Remaja */}
+              <div className="space-y-3 bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-sm">
+                <div className="flex items-center justify-between border-b border-sky-200/50 pb-2">
+                  <div>
+                    <h4 className="font-extrabold text-xs text-blue-900 uppercase">REMAJA</h4>
+                    <p className="text-[10px] text-blue-700 font-semibold">Iuran: Rp 40.000</p>
+                  </div>
+                  <span className="text-[10px] bg-sky-100/80 backdrop-blur-sm text-sky-700 font-black px-2.5 py-1 rounded-full border border-sky-200 shadow-sm">
+                    {UANG_NATAL_PAID_DATA.remaja.length} Orang
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {UANG_NATAL_PAID_DATA.remaja.map((name, i) => (
+                    <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-sky-300 hover:bg-white/80 transition-all">
+                      <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0" />
+                      <span className="truncate">{name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-3.5 bg-white/50 backdrop-blur-md border-t border-white/50 shrink-0 text-right">
+              <button
+                onClick={() => setShowUangNatalModal(false)}
+                className="w-full bg-blue-600/90 hover:bg-blue-600 backdrop-blur-md text-white font-bold px-5 py-3 rounded-xl text-xs cursor-pointer transition-all shadow-md shadow-blue-500/20 border border-blue-500/50"
+              >
+                Tutup Data
+              </button>
+            </div>
           </div>
         </div>
       )}

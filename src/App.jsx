@@ -878,9 +878,7 @@ export default function App() {
               <h4 className="font-extrabold text-sm">
                 Kelola & Finalisasi Presensi
               </h4>
-              <p className="text-xs text-sky-100/90 leading-relaxed">
-                Buka halaman absensi lengkap dengan dropdown status per anggota, tombol set cepat, pencarian, dan simpan otomatis ke Supabase.
-              </p>
+
 
               <button
                 onClick={() => setActiveTab('attendance_page')}
@@ -898,9 +896,7 @@ export default function App() {
               <h4 className="font-extrabold text-sm">
                 Akses Galeri & Dokumentasi Natal
               </h4>
-              <p className="text-xs text-sky-100/80 leading-relaxed">
-                Anda sudah terautentikasi secara permanen. Klik tombol di bawah ini untuk membuka tautan dokumentasi resmi kapan saja.
-              </p>
+
               <a
                 href={REDIRECT_URL}
                 target="_blank"

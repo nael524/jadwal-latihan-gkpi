@@ -127,7 +127,7 @@ const SCHEDULE_DATA = [
     activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
-    snackNote: 'Spesial Hari Ini: Makan Roti & Bandrek Panas (Gratis) + Clean Q'
+    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   },
   {
     id: 10,

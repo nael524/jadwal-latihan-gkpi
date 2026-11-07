@@ -24,7 +24,9 @@ import {
   Users,
   UserCheck,
   Wallet,
-  Receipt
+  Receipt,
+  Plus,
+  Trash2
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -132,7 +134,7 @@ const SCHEDULE_DATA = [
   {
     id: 10,
     day: 'SABTU',
-    date: '7 November ',
+    date: '7 November 2026',
     time: '20.00 Malam',
     location: 'Gereja GKPI Immanuel',
     activity: 'Latihan Kegiatan Natal',
@@ -341,8 +343,7 @@ const NATAL_ROLES_DATA = [
   }
 ];
 
-// DATA SEMENTARA: STATUS UANG NATAL
-const UANG_NATAL_PAID_DATA = {
+const DEFAULT_UANG_NATAL = {
   pemuda: ['Jona', 'Mayka', 'David', 'Rony'],
   remaja: []
 };
@@ -356,12 +357,13 @@ const parseScheduleDate = (dateStr) => {
     'desember': 11
   };
 
-  const parts = dateStr.replace(',', '').split(' ');
-  if (parts.length < 3) return null;
+  const cleanStr = dateStr.replace(',', '').trim();
+  const parts = cleanStr.split(' ');
+  if (parts.length < 2) return null;
 
   const day = parseInt(parts[0], 10);
   const monthName = parts[1].toLowerCase();
-  const year = parseInt(parts[2], 10);
+  const year = parts[2] ? parseInt(parts[2], 10) : 2026;
 
   const month = monthMap[monthName];
   if (month === undefined || isNaN(day) || isNaN(year)) return null;
@@ -451,6 +453,16 @@ export default function App() {
   // Modal Uang Natal
   const [showUangNatalModal, setShowUangNatalModal] = useState(false);
 
+  // Data Uang Natal yang bisa diupdate (persisted di localStorage)
+  const [uangNatalData, setUangNatalData] = useState(() => {
+    const saved = localStorage.getItem('gkpi_uang_natal');
+    return saved ? JSON.parse(saved) : DEFAULT_UANG_NATAL;
+  });
+
+  // State Input Pembayaran Baru
+  const [newPaidName, setNewPaidName] = useState('');
+  const [newPaidCategory, setNewPaidCategory] = useState('pemuda');
+
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('gkpi_isLoggedIn') === 'true';
   });
@@ -462,6 +474,11 @@ export default function App() {
   const VALID_USERNAME = 'pemuda';
   const VALID_PASSWORD = 'natal2026';
   const REDIRECT_URL = 'https://dokumentasi-orcin.vercel.app/';
+
+  // Save Uang Natal data saat berubah
+  useEffect(() => {
+    localStorage.setItem('gkpi_uang_natal', JSON.stringify(uangNatalData));
+  }, [uangNatalData]);
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -535,6 +552,31 @@ export default function App() {
   const handleCloseScheduleNotice = () => {
     playCuteNotificationSound();
     setShowNotice(false);
+  };
+
+  // Tambah Anggota Pembayaran Natal (Admin/Account Tab)
+  const handleAddPaidMember = (e) => {
+    e.preventDefault();
+    if (!newPaidName.trim()) return;
+
+    const formattedName = newPaidName.trim();
+    setUangNatalData((prev) => {
+      if (prev[newPaidCategory].includes(formattedName)) return prev;
+      return {
+        ...prev,
+        [newPaidCategory]: [...prev[newPaidCategory], formattedName]
+      };
+    });
+
+    setNewPaidName('');
+  };
+
+  // Hapus Anggota Pembayaran Natal
+  const handleRemovePaidMember = (category, name) => {
+    setUangNatalData((prev) => ({
+      ...prev,
+      [category]: prev[category].filter((m) => m !== name)
+    }));
   };
 
   const filteredSchedule = SCHEDULE_DATA.filter((item) => {
@@ -871,6 +913,97 @@ export default function App() {
               </div>
             </div>
 
+            {/* MANAJEMEN PEMBAYARAN UANG NATAL (INPUT DAN UPDATE NAMA) */}
+            <div className="bg-white rounded-2xl p-4 border border-blue-200/90 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div className="flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-blue-600" />
+                  <h4 className="font-extrabold text-xs text-slate-900 uppercase">
+                    Kelola Pembayaran Uang Natal
+                  </h4>
+                </div>
+                <span className="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-full">
+                  Admin
+                </span>
+              </div>
+
+              <form onSubmit={handleAddPaidMember} className="space-y-2.5 text-xs">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ketik Nama (cth: Budi)"
+                    value={newPaidName}
+                    onChange={(e) => setNewPaidName(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-600 font-medium text-xs"
+                  />
+                  <select
+                    value={newPaidCategory}
+                    onChange={(e) => setNewPaidCategory(e.target.value)}
+                    className="px-2.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-600 font-bold text-xs bg-slate-50 text-slate-700"
+                  >
+                    <option value="pemuda">Pemuda/i</option>
+                    <option value="remaja">Remaja</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-600 to-sky-400 hover:from-blue-700 hover:to-sky-500 text-white font-bold py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Pembayar Lunas</span>
+                </button>
+              </form>
+
+              {/* LIST DENGAN HAPUS AKUN ADMIN */}
+              <div className="space-y-2 pt-1">
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-bold text-blue-800 mb-1">
+                    <span>Pemuda ({uangNatalData.pemuda.length})</span>
+                  </div>
+                  {uangNatalData.pemuda.length === 0 ? (
+                    <p className="text-[10px] text-slate-400 italic">Belum ada data</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {uangNatalData.pemuda.map((name, i) => (
+                        <span key={i} className="inline-flex items-center gap-1 bg-slate-100 text-slate-800 text-[11px] font-semibold px-2.5 py-1 rounded-lg border border-slate-200">
+                          {name}
+                          <button
+                            onClick={() => handleRemovePaidMember('pemuda', name)}
+                            className="text-rose-500 hover:text-rose-700 cursor-pointer ml-0.5"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-bold text-sky-800 mb-1">
+                    <span>Remaja ({uangNatalData.remaja.length})</span>
+                  </div>
+                  {uangNatalData.remaja.length === 0 ? (
+                    <p className="text-[10px] text-slate-400 italic">Belum ada data</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {uangNatalData.remaja.map((name, i) => (
+                        <span key={i} className="inline-flex items-center gap-1 bg-slate-100 text-slate-800 text-[11px] font-semibold px-2.5 py-1 rounded-lg border border-slate-200">
+                          {name}
+                          <button
+                            onClick={() => handleRemovePaidMember('remaja', name)}
+                            className="text-rose-500 hover:text-rose-700 cursor-pointer ml-0.5"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="bg-gradient-to-r from-blue-600 to-sky-400 rounded-2xl p-5 text-white shadow-lg space-y-3">
               <div className="flex items-center gap-2 text-sky-100 font-bold text-xs uppercase tracking-wider">
                 <UserCheck className="w-4 h-4" /> SISTEM ABSENSI PEMUDA
@@ -878,7 +1011,6 @@ export default function App() {
               <h4 className="font-extrabold text-sm">
                 Kelola & Finalisasi Presensi
               </h4>
-
 
               <button
                 onClick={() => setActiveTab('attendance_page')}
@@ -1107,17 +1239,21 @@ export default function App() {
                     <p className="text-[10px] text-blue-700 font-semibold">Iuran: Rp 60.000</p>
                   </div>
                   <span className="text-[10px] bg-blue-100/80 backdrop-blur-sm text-blue-700 font-black px-2.5 py-1 rounded-full border border-blue-200 shadow-sm">
-                    {UANG_NATAL_PAID_DATA.pemuda.length} Orang
+                    {uangNatalData.pemuda.length} Orang
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {UANG_NATAL_PAID_DATA.pemuda.map((name, i) => (
-                    <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-blue-300 hover:bg-white/80 transition-all">
-                      <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
-                      <span className="truncate">{name}</span>
-                    </div>
-                  ))}
-                </div>
+                {uangNatalData.pemuda.length === 0 ? (
+                  <p className="text-[11px] text-slate-400 italic text-center">Belum ada pembayar</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {uangNatalData.pemuda.map((name, i) => (
+                      <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-blue-300 hover:bg-white/80 transition-all">
+                        <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                        <span className="truncate">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Seksi Remaja */}
@@ -1128,17 +1264,21 @@ export default function App() {
                     <p className="text-[10px] text-blue-700 font-semibold">Iuran: Rp 40.000</p>
                   </div>
                   <span className="text-[10px] bg-sky-100/80 backdrop-blur-sm text-sky-700 font-black px-2.5 py-1 rounded-full border border-sky-200 shadow-sm">
-                    {UANG_NATAL_PAID_DATA.remaja.length} Orang
+                    {uangNatalData.remaja.length} Orang
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {UANG_NATAL_PAID_DATA.remaja.map((name, i) => (
-                    <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-sky-300 hover:bg-white/80 transition-all">
-                      <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0" />
-                      <span className="truncate">{name}</span>
-                    </div>
-                  ))}
-                </div>
+                {uangNatalData.remaja.length === 0 ? (
+                  <p className="text-[11px] text-slate-400 italic text-center">Belum ada pembayar</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {uangNatalData.remaja.map((name, i) => (
+                      <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-sky-300 hover:bg-white/80 transition-all">
+                        <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0" />
+                        <span className="truncate">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

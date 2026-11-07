@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import logo from "../src/assets/Logo.png";
 import AttendancePage from './assets/pages/AttendancePage';
+import { supabase } from './supabaseClient'; // Sesuaikan path ini dengan lokasi file supabaseClient kamu
 import {
   Clock,
   Utensils,
@@ -26,7 +27,9 @@ import {
   Wallet,
   Receipt,
   Plus,
-  Trash2
+  Trash2,
+  Loader2,
+  Image as ImageIcon
 } from 'lucide-react';
 
 const SCHEDULE_DATA = [
@@ -343,11 +346,6 @@ const NATAL_ROLES_DATA = [
   }
 ];
 
-const DEFAULT_UANG_NATAL = {
-  pemuda: ['Jona', 'Mayka', 'David', 'Rony'],
-  remaja: []
-};
-
 const parseScheduleDate = (dateStr) => {
   if (!dateStr || dateStr === 'STAY TUNED') return null;
 
@@ -419,8 +417,8 @@ const GKPILoader = () => (
   <div className="fixed inset-0 bg-white text-slate-900 z-50 flex flex-col items-center justify-center p-4 font-sans">
     <div className="relative flex flex-col items-center max-w-sm w-full text-center space-y-6">
       <div className="relative flex items-center justify-center">
-        <div className="w-28 h-28 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
-        <div className="absolute w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 p-2">
+        <div className="w-28 h-28 rounded-full border-4 border-emerald-100 border-t-emerald-600 animate-spin"></div>
+        <div className="absolute w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/20 p-2">
           <img
             src={logo}
             alt="Logo GKPI"
@@ -432,7 +430,7 @@ const GKPILoader = () => (
         <h2 className="text-xl font-black text-slate-900 tracking-wider uppercase">
           GKPI IMMANUEL
         </h2>
-        <p className="text-xs font-semibold text-blue-600 tracking-widest uppercase">
+        <p className="text-xs font-semibold text-emerald-600 tracking-widest uppercase">
           Resort Tanjung Mulia • Medan
         </p>
       </div>
@@ -453,11 +451,9 @@ export default function App() {
   // Modal Uang Natal
   const [showUangNatalModal, setShowUangNatalModal] = useState(false);
 
-  // Data Uang Natal yang bisa diupdate (persisted di localStorage)
-  const [uangNatalData, setUangNatalData] = useState(() => {
-    const saved = localStorage.getItem('gkpi_uang_natal');
-    return saved ? JSON.parse(saved) : DEFAULT_UANG_NATAL;
-  });
+  // Data Uang Natal dari Supabase Realtime
+  const [paidList, setPaidList] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // State Input Pembayaran Baru
   const [newPaidName, setNewPaidName] = useState('');
@@ -475,10 +471,41 @@ export default function App() {
   const VALID_PASSWORD = 'natal2026';
   const REDIRECT_URL = 'https://dokumentasi-orcin.vercel.app/';
 
-  // Save Uang Natal data saat berubah
+  // Fetch Data Awal & Subskripsi Realtime dari Supabase
   useEffect(() => {
-    localStorage.setItem('gkpi_uang_natal', JSON.stringify(uangNatalData));
-  }, [uangNatalData]);
+    const fetchPaidData = async () => {
+      const { data, error } = await supabase
+        .from('uang_natal')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        setPaidList(data);
+      }
+    };
+
+    fetchPaidData();
+
+    // Setup Realtime Listener
+    const channel = supabase
+      .channel('uang_natal_realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'uang_natal' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setPaidList((prev) => [...prev, payload.new]);
+          } else if (payload.eventType === 'DELETE') {
+            setPaidList((prev) => prev.filter((item) => item.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -554,30 +581,29 @@ export default function App() {
     setShowNotice(false);
   };
 
-  // Tambah Anggota Pembayaran Natal (Admin/Account Tab)
-  const handleAddPaidMember = (e) => {
+  // Tambah Anggota Pembayaran Natal (Supabase Insert)
+  const handleAddPaidMember = async (e) => {
     e.preventDefault();
-    if (!newPaidName.trim()) return;
+    if (!newPaidName.trim() || isSubmitting) return;
 
-    const formattedName = newPaidName.trim();
-    setUangNatalData((prev) => {
-      if (prev[newPaidCategory].includes(formattedName)) return prev;
-      return {
-        ...prev,
-        [newPaidCategory]: [...prev[newPaidCategory], formattedName]
-      };
-    });
+    setIsSubmitting(true);
+    const { error } = await supabase.from('uang_natal').insert([
+      { name: newPaidName.trim(), category: newPaidCategory }
+    ]);
 
-    setNewPaidName('');
+    setIsSubmitting(false);
+    if (!error) {
+      setNewPaidName('');
+    }
   };
 
-  // Hapus Anggota Pembayaran Natal
-  const handleRemovePaidMember = (category, name) => {
-    setUangNatalData((prev) => ({
-      ...prev,
-      [category]: prev[category].filter((m) => m !== name)
-    }));
+  // Hapus Anggota Pembayaran Natal (Supabase Delete)
+  const handleRemovePaidMember = async (id) => {
+    await supabase.from('uang_natal').delete().eq('id', id);
   };
+
+  const pemudaList = paidList.filter((item) => item.category === 'pemuda');
+  const remajaList = paidList.filter((item) => item.category === 'remaja');
 
   const filteredSchedule = SCHEDULE_DATA.filter((item) => {
     const matchDay = filterDay === 'SEMUA' || item.day.includes(filterDay);
@@ -624,7 +650,7 @@ export default function App() {
           >
             <Bell className="w-5 h-5" />
             {nextSchedule && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-sky-500 rounded-full ring-2 ring-white animate-pulse"></span>
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white animate-pulse"></span>
             )}
           </button>
         </div>
@@ -649,15 +675,15 @@ export default function App() {
               </p>
             </div>
 
-            {/* DASHBOARD CARD: UANG NATAL */}
+            {/* DASHBOARD CARD: UANG NATAL (GRADIASI HIJAU MUDA) */}
             <div
               onClick={() => setShowUangNatalModal(true)}
-              className="bg-gradient-to-br from-blue-600/90 to-sky-400/90 backdrop-blur-md rounded-2xl p-5 text-white shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-[1.02] transition-all relative overflow-hidden group border border-white/30"
+              className="bg-gradient-to-br from-emerald-500 to-teal-400 backdrop-blur-md rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/25 cursor-pointer hover:scale-[1.02] transition-all relative overflow-hidden group border border-white/30"
             >
               <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/20 rounded-full blur-2xl pointer-events-none group-hover:bg-white/30 transition-all"></div>
 
               <div className="flex items-center justify-between mb-3 relative z-10">
-                <div className="flex items-center gap-2 text-sky-50 text-xs font-extrabold uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-emerald-50 text-xs font-extrabold uppercase tracking-wider">
                   <Wallet className="w-4 h-4 text-white" /> Pembayaran Uang Natal
                 </div>
                 <span className="text-[9px] bg-white/20 hover:bg-white/30 transition-colors px-2.5 py-1 rounded-full font-bold flex items-center gap-1 uppercase tracking-wider backdrop-blur-md border border-white/40">
@@ -666,12 +692,12 @@ export default function App() {
               </div>
 
               <div className="flex items-center gap-3 relative z-10">
-                <div className="flex-1 bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
-                  <p className="text-[10px] text-sky-100 font-semibold mb-0.5 uppercase tracking-wide">Pemuda/i</p>
+                <div className="flex-1 bg-white/15 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
+                  <p className="text-[10px] text-emerald-100 font-semibold mb-0.5 uppercase tracking-wide">Pemuda/i</p>
                   <p className="font-black text-[15px]">Rp 60.000</p>
                 </div>
-                <div className="flex-1 bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
-                  <p className="text-[10px] text-sky-100 font-semibold mb-0.5 uppercase tracking-wide">Remaja</p>
+                <div className="flex-1 bg-white/15 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
+                  <p className="text-[10px] text-emerald-100 font-semibold mb-0.5 uppercase tracking-wide">Remaja</p>
                   <p className="font-black text-[15px]">Rp 40.000</p>
                 </div>
               </div>
@@ -913,63 +939,80 @@ export default function App() {
               </div>
             </div>
 
-            {/* MANAJEMEN PEMBAYARAN UANG NATAL (INPUT DAN UPDATE NAMA) */}
-            <div className="bg-white rounded-2xl p-4 border border-blue-200/90 shadow-xs space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            {/* MANAJEMEN PEMBAYARAN UANG NATAL (RESPONSIF & MODERN - GRADIASI HIJAU MUDA) */}
+            <div className="bg-gradient-to-br from-emerald-50 via-teal-50/40 to-white rounded-2xl p-4 sm:p-5 border border-emerald-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-blue-600" />
-                  <h4 className="font-extrabold text-xs text-slate-900 uppercase">
-                    Kelola Pembayaran Uang Natal
-                  </h4>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                    <Wallet className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-wide">
+                      Kelola Pembayaran Natal
+                    </h4>
+                    <p className="text-[10px] text-emerald-700 font-medium">Update status pelunasan</p>
+                  </div>
                 </div>
-                <span className="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-full">
-                  Admin
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Realtime
                 </span>
               </div>
 
-              <form onSubmit={handleAddPaidMember} className="space-y-2.5 text-xs">
-                <div className="flex gap-2">
+              <form onSubmit={handleAddPaidMember} className="space-y-2 text-xs">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
-                    placeholder="Ketik Nama (cth: Budi)"
+                    placeholder="Ketik nama anggota..."
                     value={newPaidName}
                     onChange={(e) => setNewPaidName(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-600 font-medium text-xs"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl border border-emerald-200/90 focus:outline-none focus:border-emerald-600 bg-white font-semibold text-xs text-slate-800 placeholder-slate-400 shadow-inner"
                   />
                   <select
                     value={newPaidCategory}
                     onChange={(e) => setNewPaidCategory(e.target.value)}
-                    className="px-2.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-600 font-bold text-xs bg-slate-50 text-slate-700"
+                    className="px-3 py-2.5 rounded-xl border border-emerald-200/90 focus:outline-none focus:border-emerald-600 font-bold text-xs bg-white text-slate-800 cursor-pointer shadow-xs"
                   >
-                    <option value="pemuda">Pemuda/i</option>
-                    <option value="remaja">Remaja</option>
+                    <option value="pemuda">Pemuda/i (Rp 60k)</option>
+                    <option value="remaja">Remaja (Rp 40k)</option>
                   </select>
                 </div>
+
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-sky-400 hover:from-blue-700 hover:to-sky-500 text-white font-bold py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-extrabold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Tambah Pembayar Lunas</span>
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 stroke-[3]" />
+                      <span>TAMBAH PEMBAYAR LUNAS</span>
+                    </>
+                  )}
                 </button>
               </form>
 
-              {/* LIST DENGAN HAPUS AKUN ADMIN */}
-              <div className="space-y-2 pt-1">
-                <div>
-                  <div className="flex items-center justify-between text-[11px] font-bold text-blue-800 mb-1">
-                    <span>Pemuda ({uangNatalData.pemuda.length})</span>
+              {/* LIST ANGGOTA PEMBAYAR */}
+              <div className="space-y-3 pt-1">
+                <div className="bg-white/80 rounded-xl p-3 border border-emerald-100 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-[11px] font-extrabold text-emerald-900 border-b border-emerald-50 pb-1.5">
+                    <span>SEKSI PEMUDA/I</span>
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-black">
+                      {pemudaList.length} Lunas
+                    </span>
                   </div>
-                  {uangNatalData.pemuda.length === 0 ? (
-                    <p className="text-[10px] text-slate-400 italic">Belum ada data</p>
+                  {pemudaList.length === 0 ? (
+                    <p className="text-[10px] text-slate-400 italic">Belum ada pembayar</p>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
-                      {uangNatalData.pemuda.map((name, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 bg-slate-100 text-slate-800 text-[11px] font-semibold px-2.5 py-1 rounded-lg border border-slate-200">
-                          {name}
+                      {pemudaList.map((item) => (
+                        <span key={item.id} className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-emerald-200/80 shadow-2xs">
+                          {item.name}
                           <button
-                            onClick={() => handleRemovePaidMember('pemuda', name)}
-                            className="text-rose-500 hover:text-rose-700 cursor-pointer ml-0.5"
+                            onClick={() => handleRemovePaidMember(item.id)}
+                            className="text-rose-400 hover:text-rose-600 cursor-pointer transition-colors"
+                            title="Hapus Nama"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -979,20 +1022,24 @@ export default function App() {
                   )}
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between text-[11px] font-bold text-sky-800 mb-1">
-                    <span>Remaja ({uangNatalData.remaja.length})</span>
+                <div className="bg-white/80 rounded-xl p-3 border border-teal-100 space-y-2 shadow-xs">
+                  <div className="flex items-center justify-between text-[11px] font-extrabold text-teal-900 border-b border-teal-50 pb-1.5">
+                    <span>SEKSI REMAJA</span>
+                    <span className="bg-teal-100 text-teal-800 text-[10px] px-2 py-0.5 rounded-full font-black">
+                      {remajaList.length} Lunas
+                    </span>
                   </div>
-                  {uangNatalData.remaja.length === 0 ? (
-                    <p className="text-[10px] text-slate-400 italic">Belum ada data</p>
+                  {remajaList.length === 0 ? (
+                    <p className="text-[10px] text-slate-400 italic">Belum ada pembayar</p>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
-                      {uangNatalData.remaja.map((name, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 bg-slate-100 text-slate-800 text-[11px] font-semibold px-2.5 py-1 rounded-lg border border-slate-200">
-                          {name}
+                      {remajaList.map((item) => (
+                        <span key={item.id} className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-900 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-teal-200/80 shadow-2xs">
+                          {item.name}
                           <button
-                            onClick={() => handleRemovePaidMember('remaja', name)}
-                            className="text-rose-500 hover:text-rose-700 cursor-pointer ml-0.5"
+                            onClick={() => handleRemovePaidMember(item.id)}
+                            className="text-rose-400 hover:text-rose-600 cursor-pointer transition-colors"
+                            title="Hapus Nama"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -1004,36 +1051,38 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-blue-600 to-sky-400 rounded-2xl p-5 text-white shadow-lg space-y-3">
-              <div className="flex items-center gap-2 text-sky-100 font-bold text-xs uppercase tracking-wider">
-                <UserCheck className="w-4 h-4" /> SISTEM ABSENSI PEMUDA
+            {/* CARD SISTEM ABSENSI PEMUDA (GRADIASI HIJAU) */}
+            <div className="bg-gradient-to-r from-emerald-600 to-green-500 rounded-2xl p-5 text-white shadow-lg shadow-emerald-600/20 space-y-3">
+              <div className="flex items-center gap-2 text-emerald-100 font-bold text-xs uppercase tracking-wider">
+                <UserCheck className="w-4 h-4 text-white" /> SISTEM ABSENSI PEMUDA
               </div>
               <h4 className="font-extrabold text-sm">
-                Kelola & Finalisasi Presensi
+                Kelola & Finalisasi Presensi Latihan
               </h4>
 
               <button
                 onClick={() => setActiveTab('attendance_page')}
-                className="w-full bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer"
+                className="w-full bg-white text-emerald-800 hover:bg-emerald-50 font-extrabold text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
-                <UserCheck className="w-4 h-4 text-blue-600" />
+                <UserCheck className="w-4 h-4 text-emerald-600" />
                 <span>BUKA HALAMAN ABSENSI</span>
               </button>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-700 to-sky-500 rounded-2xl p-5 text-white shadow-md space-y-3">
-              <div className="flex items-center gap-2 text-sky-200 font-bold text-xs">
-                <Sparkles className="w-4 h-4" /> DOKUMENTASI TERSEDIA
+            {/* CARD DOKUMENTASI TERSEDIA (GRADIASI ORANYE) */}
+            <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 text-white shadow-lg shadow-orange-500/20 space-y-3">
+              <div className="flex items-center gap-2 text-amber-100 font-bold text-xs uppercase tracking-wider">
+                <ImageIcon className="w-4 h-4 text-white" /> DOKUMENTASI TERSEDIA
               </div>
               <h4 className="font-extrabold text-sm">
-                Akses Galeri & Dokumentasi Natal
+                Akses Galeri & Foto Kegiatan Natal
               </h4>
 
               <a
                 href={REDIRECT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs py-3 rounded-xl transition-all shadow-md"
+                className="inline-flex items-center justify-center gap-2 w-full bg-white text-orange-600 hover:bg-orange-50 font-extrabold text-xs py-3 rounded-xl transition-all shadow-md cursor-pointer"
               >
                 <span>Buka Dokumentasi</span>
                 <ExternalLink className="w-4 h-4" />
@@ -1166,7 +1215,7 @@ export default function App() {
                 className="w-full bg-gradient-to-r from-blue-600 to-sky-400 hover:from-blue-700 hover:to-sky-500 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Masuk & Buka Dokumentasi</span>
+                <span>Masuk & Buka Akses</span>
               </button>
             </form>
           </div>
@@ -1211,15 +1260,15 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DATA UANG NATAL (LIST YANG SUDAH LUNAS) - GLASSMORPHISM BIRU */}
+      {/* MODAL DATA UANG NATAL (LIST YANG SUDAH LUNAS) - GLASSMORPHISM HIJAU MUDA */}
       {showUangNatalModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
-          <div className="bg-gradient-to-br from-blue-50/90 to-white/90 backdrop-blur-xl w-full max-w-sm rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/50 text-slate-800 flex flex-col max-h-[85vh]">
-            <div className="bg-gradient-to-r from-blue-600/90 to-sky-500/90 backdrop-blur-md text-white p-4 flex items-center justify-between shrink-0 border-b border-white/20">
+          <div className="bg-gradient-to-br from-emerald-50/95 to-teal-50/95 backdrop-blur-xl w-full max-w-sm rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/60 text-slate-800 flex flex-col max-h-[85vh]">
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-500 backdrop-blur-md text-white p-4 flex items-center justify-between shrink-0 border-b border-white/20">
               <div className="flex items-center gap-2">
-                <Wallet className="w-5 h-5 text-sky-100" />
+                <Wallet className="w-5 h-5 text-emerald-100" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wide text-white">
-                  Pembayaran Lunas
+                  Pembayaran Lunas Uang Natal
                 </h3>
               </div>
               <button
@@ -1230,26 +1279,26 @@ export default function App() {
               </button>
             </div>
 
-            <div className="p-4 overflow-y-auto space-y-5 bg-transparent">
+            <div className="p-4 overflow-y-auto space-y-4 bg-transparent">
               {/* Seksi Pemuda */}
-              <div className="space-y-3 bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-sm">
-                <div className="flex items-center justify-between border-b border-blue-200/50 pb-2">
+              <div className="space-y-3 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-emerald-100 shadow-sm">
+                <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2">
                   <div>
-                    <h4 className="font-extrabold text-xs text-blue-900 uppercase">PEMUDA/I</h4>
-                    <p className="text-[10px] text-blue-700 font-semibold">Iuran: Rp 60.000</p>
+                    <h4 className="font-extrabold text-xs text-emerald-950 uppercase">PEMUDA/I</h4>
+                    <p className="text-[10px] text-emerald-700 font-bold">Iuran: Rp 60.000</p>
                   </div>
-                  <span className="text-[10px] bg-blue-100/80 backdrop-blur-sm text-blue-700 font-black px-2.5 py-1 rounded-full border border-blue-200 shadow-sm">
-                    {uangNatalData.pemuda.length} Orang
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2.5 py-1 rounded-full border border-emerald-200 shadow-2xs">
+                    {pemudaList.length} Orang
                   </span>
                 </div>
-                {uangNatalData.pemuda.length === 0 ? (
+                {pemudaList.length === 0 ? (
                   <p className="text-[11px] text-slate-400 italic text-center">Belum ada pembayar</p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {uangNatalData.pemuda.map((name, i) => (
-                      <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-blue-300 hover:bg-white/80 transition-all">
-                        <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
-                        <span className="truncate">{name}</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {pemudaList.map((item) => (
+                      <div key={item.id} className="bg-white/90 border border-emerald-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 flex items-center gap-2 shadow-2xs hover:border-emerald-300 transition-all">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span className="truncate">{item.name}</span>
                       </div>
                     ))}
                   </div>
@@ -1257,24 +1306,24 @@ export default function App() {
               </div>
 
               {/* Seksi Remaja */}
-              <div className="space-y-3 bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-sm">
-                <div className="flex items-center justify-between border-b border-sky-200/50 pb-2">
+              <div className="space-y-3 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-teal-100 shadow-sm">
+                <div className="flex items-center justify-between border-b border-teal-200/60 pb-2">
                   <div>
-                    <h4 className="font-extrabold text-xs text-blue-900 uppercase">REMAJA</h4>
-                    <p className="text-[10px] text-blue-700 font-semibold">Iuran: Rp 40.000</p>
+                    <h4 className="font-extrabold text-xs text-teal-950 uppercase">REMAJA</h4>
+                    <p className="text-[10px] text-teal-700 font-bold">Iuran: Rp 40.000</p>
                   </div>
-                  <span className="text-[10px] bg-sky-100/80 backdrop-blur-sm text-sky-700 font-black px-2.5 py-1 rounded-full border border-sky-200 shadow-sm">
-                    {uangNatalData.remaja.length} Orang
+                  <span className="text-[10px] bg-teal-100 text-teal-800 font-black px-2.5 py-1 rounded-full border border-teal-200 shadow-2xs">
+                    {remajaList.length} Orang
                   </span>
                 </div>
-                {uangNatalData.remaja.length === 0 ? (
+                {remajaList.length === 0 ? (
                   <p className="text-[11px] text-slate-400 italic text-center">Belum ada pembayar</p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {uangNatalData.remaja.map((name, i) => (
-                      <div key={i} className="bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm hover:border-sky-300 hover:bg-white/80 transition-all">
-                        <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0" />
-                        <span className="truncate">{name}</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {remajaList.map((item) => (
+                      <div key={item.id} className="bg-white/90 border border-teal-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 flex items-center gap-2 shadow-2xs hover:border-teal-300 transition-all">
+                        <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
+                        <span className="truncate">{item.name}</span>
                       </div>
                     ))}
                   </div>
@@ -1282,10 +1331,10 @@ export default function App() {
               </div>
             </div>
 
-            <div className="p-3.5 bg-white/50 backdrop-blur-md border-t border-white/50 shrink-0 text-right">
+            <div className="p-3.5 bg-white/60 backdrop-blur-md border-t border-emerald-100 shrink-0 text-right">
               <button
                 onClick={() => setShowUangNatalModal(false)}
-                className="w-full bg-gradient-to-r from-blue-600 to-sky-400 hover:from-blue-700 hover:to-sky-500 backdrop-blur-md text-white font-bold px-5 py-3 rounded-xl text-xs cursor-pointer transition-all shadow-md shadow-blue-500/20 border border-blue-500/50"
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-extrabold px-5 py-3 rounded-xl text-xs cursor-pointer transition-all shadow-md shadow-emerald-600/20"
               >
                 Tutup Data
               </button>

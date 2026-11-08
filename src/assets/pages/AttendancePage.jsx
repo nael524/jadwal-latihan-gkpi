@@ -24,7 +24,7 @@ const MEMBERS_BY_CATEGORY = {
         { id: 'k5', name: 'Lia Sianturi' },
         { id: 'k6', name: 'July' },
         { id: 'k7', name: 'Mayka' },
-        { id: 'k8', name: 'Nisa' },
+        { id: 'k8', name: 'Annisa Simanungkalit' },
         { id: 'k9', name: 'Kety' },
         { id: 'k10', name: 'Meli' },
         { id: 'k11', name: 'Misel' },
@@ -42,8 +42,8 @@ const MEMBERS_BY_CATEGORY = {
         { id: 'k23', name: 'Wiki' },
         { id: 'k24', name: 'David' },
         { id: 'k25', name: 'Jona' },
-        { id: 'k26', name: 'Cia Pasaribu' },
-        { id: 'k27', name: 'Annisa' }
+        { id: 'k26', name: 'Cia Pasaribu' }
+
     ],
     'Latihan Kegiatan Natal': [
         { id: 'g1', name: 'Lia Pakpahan' },

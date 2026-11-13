@@ -158,9 +158,31 @@ const SCHEDULE_DATA = [
   },
   {
     id: 12,
-    day: 'SABTU',
-    date: '15 November 2026',
+    day: 'JUMAT',
+    date: '13 November 2026',
+    time: '18.30 Malam',
+    location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Koor Natal',
+    hasSpecialSnack: false,
+    snackTitle: 'Air Mineral (Clean Q)',
+    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
+  },
+  {
+    id: 13,
+    day: 'Sabtu',
+    date: '14 November 2026',
     time: '19.00 Malam',
+    location: 'Gereja GKPI Immanuel',
+    activity: 'Latihan Kegiatan Natal',
+    hasSpecialSnack: false,
+    snackTitle: 'Air Mineral (Clear Q)',
+    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
+  },
+  {
+    id: 14,
+    day: 'Minggu',
+    date: '15 November 2026',
+    time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
     activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
@@ -168,30 +190,8 @@ const SCHEDULE_DATA = [
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   },
   {
-    id: 13,
-    day: 'MINGGU',
-    date: '16 November 2026',
-    time: '14.00 Siang',
-    location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Koor Natal',
-    hasSpecialSnack: false,
-    snackTitle: 'Air Mineral (Clear Q)',
-    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
-  },
-  {
-    id: 14,
-    day: 'SABTU',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
-    location: 'Gereja GKPI Immanuel',
-    activity: 'STAY TUNED',
-    hasSpecialSnack: false,
-    snackTitle: 'Air Mineral (Clean Q)',
-    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
-  },
-  {
     id: 15,
-    day: 'MINGGU',
+    day: 'STAY TUNED',
     date: 'STAY TUNED',
     time: 'STAY TUNED',
     location: 'Gereja GKPI Immanuel',

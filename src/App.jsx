@@ -342,7 +342,7 @@ const NATAL_ROLES_DATA = [
   },
   {
     title: 'INFOKUS',
-    members: ['Wiki']
+    members: ['Mino', 'Erika']
   }
 ];
 

@@ -46,7 +46,8 @@ const MEMBERS_BY_CATEGORY = {
         { id: 'k23', name: 'Wiki' },
         { id: 'k24', name: 'David' },
         { id: 'k25', name: 'Jona' },
-        { id: 'k26', name: 'Cia Pasaribu' }
+        { id: 'k26', name: 'Cia' },
+        { id: 'k27', name: 'Kriston' }
     ],
     'Latihan Kegiatan Natal': [
         { id: 'g1', name: 'Lia Pakpahan' },
@@ -384,8 +385,8 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                     <button
                         onClick={() => setActiveTab('input')}
                         className={`flex-1 py-2.5 px-3 text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer ${activeTab === 'input'
-                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
-                                : 'text-slate-600 hover:bg-slate-50'
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+                            : 'text-slate-600 hover:bg-slate-50'
                             }`}
                     >
                         <UserCheck className="w-4 h-4" /> Presensi Harian
@@ -393,8 +394,8 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                     <button
                         onClick={() => setActiveTab('rekap')}
                         className={`flex-1 py-2.5 px-3 text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer ${activeTab === 'rekap'
-                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
-                                : 'text-slate-600 hover:bg-slate-50'
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+                            : 'text-slate-600 hover:bg-slate-50'
                             }`}
                     >
                         <BarChart3 className="w-4 h-4" /> Total Rekap Kehadiran
@@ -531,14 +532,14 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                                                 setAttendanceMap({ ...attendanceMap, [m.id]: e.target.value })
                                             }
                                             className={`text-[11px] font-extrabold px-3 py-2 rounded-xl border transition-all cursor-pointer shrink-0 ${attendanceMap[m.id] === 'Hadir'
-                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                                                    : attendanceMap[m.id] === 'Izin'
-                                                        ? 'bg-amber-50 text-amber-700 border-amber-300'
-                                                        : attendanceMap[m.id] === 'Sakit'
-                                                            ? 'bg-blue-50 text-blue-700 border-blue-300'
-                                                            : attendanceMap[m.id] === 'Alfa'
-                                                                ? 'bg-rose-50 text-rose-700 border-rose-300'
-                                                                : 'bg-slate-100 text-slate-500 border-slate-300 font-semibold'
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                                : attendanceMap[m.id] === 'Izin'
+                                                    ? 'bg-amber-50 text-amber-700 border-amber-300'
+                                                    : attendanceMap[m.id] === 'Sakit'
+                                                        ? 'bg-blue-50 text-blue-700 border-blue-300'
+                                                        : attendanceMap[m.id] === 'Alfa'
+                                                            ? 'bg-rose-50 text-rose-700 border-rose-300'
+                                                            : 'bg-slate-100 text-slate-500 border-slate-300 font-semibold'
                                                 }`}
                                         >
                                             <option value="" disabled>
@@ -560,8 +561,8 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                                 onClick={handleSave}
                                 disabled={isSubmitting || isLoading}
                                 className={`w-full py-3.5 rounded-2xl font-extrabold text-xs tracking-wide flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer ${isSaved
-                                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white'
-                                        : 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white'
+                                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white'
+                                    : 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white'
                                     }`}
                             >
                                 {isSubmitting ? (
@@ -633,8 +634,8 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                                         key={tab.key}
                                         onClick={() => setRekapCategoryFilter(tab.key)}
                                         className={`text-[11px] font-bold px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap ${rekapCategoryFilter === tab.key
-                                                ? 'bg-blue-600 text-white shadow-2xs'
-                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            ? 'bg-blue-600 text-white shadow-2xs'
+                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                             }`}
                                     >
                                         {tab.label}
@@ -672,8 +673,8 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                                                         <span
                                                             key={cat}
                                                             className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${cat === 'Koor'
-                                                                    ? 'bg-blue-50 text-blue-600 border border-blue-200/60'
-                                                                    : 'bg-indigo-50 text-indigo-600 border border-indigo-200/60'
+                                                                ? 'bg-blue-50 text-blue-600 border border-blue-200/60'
+                                                                : 'bg-indigo-50 text-indigo-600 border border-indigo-200/60'
                                                                 }`}
                                                         >
                                                             {cat}
@@ -695,10 +696,10 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                                             <div className="col-span-3 flex flex-col items-end gap-1">
                                                 <span
                                                     className={`text-[10px] font-black px-2 py-0.5 rounded-md border ${item.persentase >= 75
-                                                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                                            : item.persentase >= 50
-                                                                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                                                : 'bg-rose-50 text-rose-700 border-rose-200'
+                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                        : item.persentase >= 50
+                                                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                                            : 'bg-rose-50 text-rose-700 border-rose-200'
                                                         }`}
                                                 >
                                                     {item.persentase}%
@@ -706,10 +707,10 @@ export default function AttendancePage({ scheduleData = [], onBack }) {
                                                 <div className="w-14 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                                     <div
                                                         className={`h-full rounded-full ${item.persentase >= 75
-                                                                ? 'bg-emerald-500'
-                                                                : item.persentase >= 50
-                                                                    ? 'bg-amber-500'
-                                                                    : 'bg-rose-500'
+                                                            ? 'bg-emerald-500'
+                                                            : item.persentase >= 50
+                                                                ? 'bg-amber-500'
+                                                                : 'bg-rose-500'
                                                             }`}
                                                         style={{ width: `${item.persentase}%` }}
                                                     />

@@ -308,25 +308,25 @@ const NATAL_ROLES_DATA = [
     members: ['Keti']
   },
   {
-    title: 'FRAGMEN',
+    title: 'FRAGMEN MANUSIA JATUH DALAM DOSA',
     members: [
       'Roni',
-      'Criston',
+      'Kriston',
       'Martin',
       'Timoti',
       'Tasya',
-      'Lia Sianturi'
+      'Lia Sianturi', 'Ester'
     ]
   },
   {
-    title: 'VOCAL SOLO Fragmen',
+    title: 'VOCAL SOLO Fragmen Manusia Jatuh dalam Dosa',
     members: ['Amanda Panjaitan']
   }, {
-    title: 'VOCAL SOLO Kelahiran Yesus',
+    title: 'VOCAL SOLO Janji Keselamatan',
     members: ['Annisa Simanungkalit']
   }, {
     title: 'Janji Keselamatan',
-    members: ['Roni', 'Axsel', 'Cia', 'Timoti', 'Juli', 'Lina Panjaitan', 'Martin']
+    members: ['Roni', 'Axsel', 'Cia', 'Timoti', 'Juli', 'Ester', 'Boy']
   },
   {
     title: 'Litugri Kelahiran',

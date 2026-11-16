@@ -180,9 +180,9 @@ const SCHEDULE_DATA = [
   },
   {
     id: 14,
-    day: 'Minggu',
-    date: '15 November 2026',
-    time: '14.00 Siang',
+    day: 'Senin',
+    date: '16 November 2026',
+    time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
     activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
@@ -191,11 +191,11 @@ const SCHEDULE_DATA = [
   },
   {
     id: 15,
-    day: 'STAY TUNED',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
+    day: 'Kamis',
+    date: '19 November 2026',
+    time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'STAY TUNED',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
@@ -204,25 +204,25 @@ const SCHEDULE_DATA = [
   // DESEMBER 2026
   {
     id: 16,
-    day: 'STAY TUNED',
-    date: 'STAY TUNED',
-    time: 'STAY TUNED',
+    day: 'Sabtu',
+    date: '21 November 2026',
+    time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Koor Natal',
-    hasSpecialSnack: true,
+    activity: 'Latihan Kegiatan Natal',
+    hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   },
   {
     id: 17,
     day: 'MINGGU',
-    date: '06, Desember 2026',
+    date: '22, November 2026',
     time: '14.00 Siang',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Gladi Koor Natal',
+    activity: 'Latihan Koor Natal',
     hasSpecialSnack: false,
-    snackTitle: 'Makan Roti & Minum Bandrek',
-    snackNote: 'Makan Roti & Minum Bandrek Hangat Gratis saat Gladi'
+    snackTitle: 'Air Mineral (Clean Q)',
+    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
   },
   {
     id: 18,

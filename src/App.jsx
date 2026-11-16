@@ -622,12 +622,12 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white pb-20 relative font-sans"
+      className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-blue-600 selection:text-white pb-24 relative font-sans"
     >
       {isLoading && <GKPILoader />}
 
       {/* HEADER UTAMA */}
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3.5">
+      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1 shadow-xs border border-slate-100">
@@ -645,132 +645,166 @@ export default function App() {
 
           <button
             onClick={() => setShowNotice(true)}
-            className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 transition-colors text-slate-700 cursor-pointer"
+            className="relative p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 transition-colors text-slate-700 cursor-pointer"
             title="Pemberitahuan Latihan"
           >
-            <Bell className="w-5 h-5" />
+            <Bell className="w-4 h-4" />
             {nextSchedule && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white animate-pulse"></span>
+              <span className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white animate-pulse"></span>
             )}
           </button>
         </div>
       </header>
 
       {/* KONTEN UTAMA */}
-      <main className="max-w-md mx-auto px-4 pt-4 w-full flex-1">
+      <main className="max-w-md mx-auto px-4 pt-5 w-full flex-1">
         {/* TAB 1: BERANDA */}
         {activeTab === 'home' && (
-          <div className="space-y-4">
+          <div className="space-y-5">
+            {/* HERO BANNER DENGAN LAYOUT HORIZONTAL BERSIH */}
             <div className="bg-gradient-to-br from-blue-600 to-sky-400 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden">
-              <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-              <div className="flex items-center gap-2 text-sky-100 text-xs font-semibold mb-2">
-                <Sparkles className="w-4 h-4 text-sky-200" />
-                <span>Shalom, Pemuda-Pemudi!</span>
+              <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+              <div className="flex items-start justify-between gap-4 relative z-10">
+                <div className="space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-xs px-2.5 py-1 rounded-lg text-sky-50 text-[11px] font-semibold border border-white/20">
+                    <Sparkles className="w-3.5 h-3.5 text-sky-200" />
+                    <span>Shalom, Pemuda-Pemudi</span>
+                  </div>
+                  <h2 className="text-lg font-extrabold leading-snug tracking-tight pt-0.5">
+                    Jadwal & Info Latihan Natal 2026
+                  </h2>
+                  <p className="text-xs text-sky-100/90 leading-relaxed font-normal">
+                    Persiapkan pelayanan terbaik kita untuk menyambut hari kelahiran Sang Juruselamat.
+                  </p>
+                </div>
               </div>
-              <h2 className="text-lg font-bold leading-snug">
-                Jadwal & Info Latihan Natal 2026
-              </h2>
-              <p className="text-xs text-sky-100/90 mt-1 font-normal">
-                Persiapkan pelayanan terbaik kita untuk menyambut hari kelahiran Sang Juruselamat.
-              </p>
             </div>
 
-            {/* DASHBOARD CARD: UANG NATAL (GRADIASI HIJAU MUDA) */}
+            {/* KARTU AGENDA LATIHAN TERDEKAT (DIPOSISIKAN SEBAGAI PRIORITAS UTAMA) */}
+            {nextSchedule && (
+              <div className="bg-white rounded-2xl border border-blue-200/90 shadow-xs overflow-hidden relative">
+                <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" /> Latihan Terdekat
+                  </span>
+                  <span className="bg-gradient-to-r from-blue-600 to-sky-400 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-2xs">
+                    {daysRemaining === 0 ? 'Hari Ini' : `${daysRemaining} Hari Lagi`}
+                  </span>
+                </div>
+
+                <div className="p-4 flex items-center justify-between gap-3">
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <h3 className="font-extrabold text-slate-900 text-sm truncate">
+                      {nextSchedule.day}, {nextSchedule.date}
+                    </h3>
+                    <p className="text-xs font-semibold text-blue-600 flex items-center gap-1.5">
+                      <Music className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{nextSchedule.activity}</span>
+                    </p>
+                    <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">{nextSchedule.location} &bull; {nextSchedule.time}</span>
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedSchedule(nextSchedule)}
+                    className="shrink-0 bg-slate-100 hover:bg-gradient-to-r hover:from-blue-600 hover:to-sky-400 hover:text-white text-slate-800 font-bold text-[11px] px-3.5 py-2.5 rounded-xl transition-all flex flex-col items-center justify-center gap-1 cursor-pointer border border-slate-200/70"
+                  >
+                    <Utensils className="w-4 h-4 text-blue-600 group-hover:text-white" />
+                    <span>Konsumsi</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* MENU AKSES CEPAT (3 KOLOM SIMETRIS) */}
+            <div className="grid grid-cols-3 gap-2.5">
+              <button
+                onClick={() => setActiveTab('schedule')}
+                className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs text-center hover:border-blue-300 transition-all group cursor-pointer flex flex-col items-center justify-center"
+              >
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <CalendarDays className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-xs text-slate-900">Jadwal</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">22 Agenda</p>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('roles')}
+                className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs text-center hover:border-sky-300 transition-all group cursor-pointer flex flex-col items-center justify-center"
+              >
+                <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-xs text-slate-900">Petugas</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">Susunan Natal</p>
+              </button>
+
+              <button
+                onClick={() => setShowUangNatalModal(true)}
+                className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-xs text-center hover:border-emerald-300 transition-all group cursor-pointer flex flex-col items-center justify-center"
+              >
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <Wallet className="w-5 h-5" />
+                </div>
+                <h4 className="font-bold text-xs text-slate-900">Kas Natal</h4>
+                <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">{paidList.length} Lunas</p>
+              </button>
+            </div>
+
+            {/* RINGKASAN PEMBAYARAN UANG NATAL */}
             <div
               onClick={() => setShowUangNatalModal(true)}
-              className="bg-gradient-to-br from-emerald-500 to-teal-400 backdrop-blur-md rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/25 cursor-pointer hover:scale-[1.02] transition-all relative overflow-hidden group border border-white/30"
+              className="bg-gradient-to-br from-emerald-500 to-teal-400 backdrop-blur-md rounded-2xl p-4 text-white shadow-lg shadow-emerald-500/20 cursor-pointer hover:scale-[1.01] transition-all relative overflow-hidden group border border-white/30"
             >
               <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/20 rounded-full blur-2xl pointer-events-none group-hover:bg-white/30 transition-all"></div>
 
               <div className="flex items-center justify-between mb-3 relative z-10">
                 <div className="flex items-center gap-2 text-emerald-50 text-xs font-extrabold uppercase tracking-wider">
-                  <Wallet className="w-4 h-4 text-white" /> Pembayaran Uang Natal
+                  <Wallet className="w-4 h-4 text-white" />
+                  <span>Informasi Iuran Natal</span>
                 </div>
-                <span className="text-[9px] bg-white/20 hover:bg-white/30 transition-colors px-2.5 py-1 rounded-full font-bold flex items-center gap-1 uppercase tracking-wider backdrop-blur-md border border-white/40">
-                  Cek Lunas <Receipt className="w-3 h-3" />
+                <span className="text-[10px] bg-white/20 hover:bg-white/30 transition-colors px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 uppercase tracking-wider backdrop-blur-md border border-white/40">
+                  Daftar Lunas <Receipt className="w-3 h-3" />
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 relative z-10">
-                <div className="flex-1 bg-white/15 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
-                  <p className="text-[10px] text-emerald-100 font-semibold mb-0.5 uppercase tracking-wide">Pemuda/i</p>
-                  <p className="font-black text-[15px]">Rp 60.000</p>
-                </div>
-                <div className="flex-1 bg-white/15 backdrop-blur-md p-3 rounded-xl border border-white/30 text-center shadow-inner">
-                  <p className="text-[10px] text-emerald-100 font-semibold mb-0.5 uppercase tracking-wide">Remaja</p>
-                  <p className="font-black text-[15px]">Rp 40.000</p>
-                </div>
-              </div>
-            </div>
-
-            {nextSchedule && (
-              <div className="bg-white rounded-2xl p-4 border border-blue-200/90 shadow-xs space-y-3 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-full blur-lg pointer-events-none"></div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                  <span className="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" /> LATIHAN TERDEKAT
-                  </span>
-                  <span className="bg-gradient-to-r from-blue-600 to-sky-400 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
-                    {daysRemaining === 0 ? 'HARI INI BGT!' : `${daysRemaining} HARI LAGI`}
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-extrabold text-slate-900 text-base">
-                      {nextSchedule.day}, {nextSchedule.date}
-                    </h3>
+              <div className="grid grid-cols-2 gap-2.5 relative z-10">
+                <div className="bg-white/15 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-white/30 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] text-emerald-100 font-semibold uppercase tracking-wide">Pemuda/i</p>
+                    <p className="font-extrabold text-sm">Rp 60.000</p>
                   </div>
-                  <p className="text-xs font-semibold text-blue-600 flex items-center gap-1">
-                    <Music className="w-3.5 h-3.5" /> {nextSchedule.activity}
-                  </p>
-                  <p className="text-xs text-slate-500 flex items-center gap-1 pt-0.5">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" /> {nextSchedule.location} &bull; Jam {nextSchedule.time}
-                  </p>
+                  <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-md font-bold">
+                    {pemudaList.length} Org
+                  </span>
                 </div>
-
-                <button
-                  onClick={() => setSelectedSchedule(nextSchedule)}
-                  className="w-full bg-slate-100 hover:bg-gradient-to-r hover:from-blue-600 hover:to-sky-400 hover:text-white text-slate-800 font-bold text-xs py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 mt-1 cursor-pointer"
-                >
-                  <Utensils className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Lihat Info Konsumsi</span>
-                </button>
+                <div className="bg-white/15 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-white/30 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] text-emerald-100 font-semibold uppercase tracking-wide">Remaja</p>
+                    <p className="font-extrabold text-sm">Rp 40.000</p>
+                  </div>
+                  <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-md font-bold">
+                    {remajaList.length} Org
+                  </span>
+                </div>
               </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => setActiveTab('schedule')}
-                className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs text-left hover:border-blue-300 transition-all group cursor-pointer"
-              >
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
-                  <CalendarDays className="w-5 h-5" />
-                </div>
-                <h4 className="font-bold text-xs text-slate-900">Semua Jadwal</h4>
-                <p className="text-[10px] text-slate-500 mt-0.5">22 Agenda latihan</p>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('roles')}
-                className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs text-left hover:border-sky-300 transition-all group cursor-pointer"
-              >
-                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <h4 className="font-bold text-xs text-slate-900">Kegiatan Natal</h4>
-                <p className="text-[10px] text-slate-500 mt-0.5">Petugas & Liturgi</p>
-              </button>
             </div>
 
-            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs space-y-2">
-              <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Catatan Penting Panitia
-              </h4>
-              <ul className="text-xs text-slate-600 space-y-1.5 pl-5 list-disc font-medium">
-                <li>Harap hadir 10 menit sebelum jam latihan dimulai.</li>
-                <li>Air mineral Clean Q disediakan gratis oleh panitia setiap latihan.</li>
-                <li>Jadwal dengan tanda khusus menyajikan Roti & Bandrek Hangat!</li>
+            {/* TATA TERTIB & CATATAN PANITIA */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs space-y-2.5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Ketentuan Latihan
+                </h4>
+                <span className="text-[10px] font-semibold text-slate-400">Panitia Natal</span>
+              </div>
+              <ul className="text-xs text-slate-600 space-y-2 pl-4 list-disc font-medium leading-relaxed">
+                <li>Harap hadir 10 menit sebelum jadwal latihan dimulai.</li>
+                <li>Air mineral Clean Q disediakan oleh panitia pada setiap sesi latihan.</li>
+                <li>Jadwal dengan tanda khusus menyediakan konsumsi tambahan berupa Roti dan Bandrek Hangat.</li>
               </ul>
             </div>
           </div>
@@ -778,9 +812,10 @@ export default function App() {
 
         {/* TAB 2: JADWAL LENGKAP */}
         {activeTab === 'schedule' && (
-          <div className="space-y-3.5">
-            <div className="bg-white rounded-2xl p-3 border border-slate-200/90 shadow-xs space-y-2.5">
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+          <div className="space-y-4">
+            {/* FILTER BAR */}
+            <div className="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-xs space-y-3">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none text-xs font-semibold">
                 <span className="text-slate-400 shrink-0 text-[11px] font-bold mr-1 flex items-center gap-1">
                   <Filter className="w-3 h-3" /> Hari:
                 </span>
@@ -798,7 +833,7 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-1 overflow-x-auto text-xs font-semibold pt-1 border-t border-slate-100">
+              <div className="flex items-center gap-1.5 overflow-x-auto text-xs font-semibold pt-2 border-t border-slate-100">
                 <span className="text-slate-400 shrink-0 text-[11px] font-bold mr-1">Bulan:</span>
                 {['SEMUA', 'Oktober', 'November', 'Desember'].map((m) => (
                   <button
@@ -815,108 +850,113 @@ export default function App() {
               </div>
             </div>
 
-            {filteredSchedule.map((item) => {
-              const isSunday = item.day === 'MINGGU';
-              const isNextUpcoming = nextSchedule && nextSchedule.id === item.id;
+            {/* DAFTAR KARTU JADWAL */}
+            <div className="space-y-3">
+              {filteredSchedule.map((item) => {
+                const isSunday = item.day === 'MINGGU';
+                const isNextUpcoming = nextSchedule && nextSchedule.id === item.id;
 
-              return (
-                <div
-                  key={item.id}
-                  className={`rounded-2xl p-4 transition-all flex items-center justify-between gap-3 relative overflow-hidden ${isNextUpcoming
-                    ? 'bg-gradient-to-r from-blue-600 to-sky-400 text-white shadow-lg ring-2 ring-blue-500 ring-offset-2'
-                    : 'bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:border-blue-300'
-                    }`}
-                >
-                  {/* BADGE JADWAL TERDEKAT */}
-                  {isNextUpcoming && (
-                    <span className="absolute top-2 right-3 bg-white/20 backdrop-blur-md text-white border border-white/30 font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-xs">
-                      <Sparkles className="w-3 h-3 text-sky-200" />
-                      {daysRemaining === 0 ? 'TERDEKAT (HARI INI)' : `TERDEKAT (${daysRemaining} HARI LAGI)`}
-                    </span>
-                  )}
-
-                  <div className="flex items-center gap-3 min-w-0 flex-1 pt-1 sm:pt-0">
-                    <div
-                      className={`px-3 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider flex flex-col items-center justify-center min-w-[70px] text-center shrink-0 border ${isNextUpcoming
-                        ? 'bg-white/20 text-white border-white/30 backdrop-blur-xs'
-                        : 'bg-blue-50 text-blue-700 border-blue-100'
-                        }`}
-                    >
-                      <span>{item.day.split(' ')[0]}</span>
-                      <span className={`text-[10px] font-semibold mt-0.5 ${isNextUpcoming ? 'text-sky-100' : 'text-blue-500'}`}>
-                        {isSunday ? '14.00' : item.day === 'JUMAT' ? '18.30' : '19.00'}
-                      </span>
-                    </div>
-
-                    <div className="space-y-0.5 min-w-0 flex-1">
-                      <div className={`font-extrabold text-xs truncate ${isNextUpcoming ? 'text-white' : 'text-slate-900'}`}>
-                        {item.date}
-                      </div>
-                      <div className={`text-[11px] font-semibold flex items-center gap-1 truncate ${isNextUpcoming ? 'text-sky-100' : 'text-blue-600'}`}>
-                        <Music className="w-3 h-3 shrink-0" />
-                        <span className="truncate">{item.activity}</span>
-                      </div>
-                      <div className={`text-[10px] font-medium ${isNextUpcoming ? 'text-sky-100/80' : 'text-slate-400'}`}>
-                        {item.time} &bull; {item.location}
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setSelectedSchedule(item)}
-                    className={`font-bold text-[11px] px-3 py-2 rounded-xl uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${isNextUpcoming
-                      ? 'bg-white text-blue-700 hover:bg-blue-50 shadow-xs'
-                      : 'bg-slate-100 hover:bg-gradient-to-r hover:from-blue-600 hover:to-sky-400 hover:text-white text-slate-700'
+                return (
+                  <div
+                    key={item.id}
+                    className={`rounded-2xl p-4 transition-all flex items-center justify-between gap-3 relative overflow-hidden ${isNextUpcoming
+                      ? 'bg-gradient-to-r from-blue-600 to-sky-400 text-white shadow-lg ring-2 ring-blue-500 ring-offset-2'
+                      : 'bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:border-blue-300'
                       }`}
                   >
-                    <Utensils className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">KONSUMSI</span>
-                  </button>
-                </div>
-              );
-            })}
+                    {isNextUpcoming && (
+                      <span className="absolute top-2.5 right-3 bg-white/20 backdrop-blur-md text-white border border-white/30 font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-2xs">
+                        <Sparkles className="w-2.5 h-2.5 text-sky-200" />
+                        {daysRemaining === 0 ? 'Hari Ini' : `${daysRemaining} Hari Lagi`}
+                      </span>
+                    )}
+
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1 pt-1 sm:pt-0">
+                      <div
+                        className={`px-3 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider flex flex-col items-center justify-center min-w-[72px] text-center shrink-0 border ${isNextUpcoming
+                          ? 'bg-white/20 text-white border-white/30 backdrop-blur-xs'
+                          : 'bg-blue-50 text-blue-700 border-blue-100'
+                          }`}
+                      >
+                        <span>{item.day.split(' ')[0]}</span>
+                        <span className={`text-[10px] font-semibold mt-0.5 ${isNextUpcoming ? 'text-sky-100' : 'text-blue-500'}`}>
+                          {isSunday ? '14.00' : item.day === 'JUMAT' ? '18.30' : '19.00'}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className={`font-extrabold text-xs truncate ${isNextUpcoming ? 'text-white' : 'text-slate-900'}`}>
+                          {item.date}
+                        </div>
+                        <div className={`text-[11px] font-semibold flex items-center gap-1.5 truncate ${isNextUpcoming ? 'text-sky-100' : 'text-blue-600'}`}>
+                          <Music className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{item.activity}</span>
+                        </div>
+                        <div className={`text-[10px] font-medium ${isNextUpcoming ? 'text-sky-100/85' : 'text-slate-400'}`}>
+                          {item.time} &bull; {item.location}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setSelectedSchedule(item)}
+                      className={`font-bold text-[11px] px-3 py-2 rounded-xl uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${isNextUpcoming
+                        ? 'bg-white text-blue-700 hover:bg-blue-50 shadow-xs'
+                        : 'bg-slate-100 hover:bg-gradient-to-r hover:from-blue-600 hover:to-sky-400 hover:text-white text-slate-700'
+                        }`}
+                    >
+                      <Utensils className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Konsumsi</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
         {/* TAB KEGIATAN NATAL & TUGAS LITURGI */}
         {activeTab === 'roles' && (
-          <div className="space-y-3.5">
-            <div className="bg-gradient-to-r from-blue-600 to-sky-400 rounded-2xl p-4 text-white shadow-md space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-sky-100 uppercase tracking-wider">
-                <BookOpen className="w-4 h-4 text-white" /> SUSUNAN & PETUGAS NATAL
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-blue-600 to-sky-400 rounded-2xl p-4 text-white shadow-md flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-sky-100 uppercase tracking-wider">
+                  <BookOpen className="w-3.5 h-3.5 text-white" /> Susunan & Petugas Natal
+                </div>
+                <h3 className="font-extrabold text-base">Pembagian Tugas Pelayanan</h3>
+                <p className="text-[11px] text-sky-100/90 font-medium">
+                  Daftar petugas liturgi, fragmen, vokal solo, dan panitia teknis.
+                </p>
               </div>
-              <h3 className="font-extrabold text-base">Pembagian Kegiatan Pemuda</h3>
-              <p className="text-[11px] text-sky-100/90 font-medium">
-                Daftar nama liturgi, fragmen, solo, dan struktur panitia Natal.
-              </p>
             </div>
 
             <div className="space-y-3">
               {NATAL_ROLES_DATA.map((role, idx) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs space-y-2.5"
+                  className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs space-y-3"
                 >
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <h4 className="font-extrabold text-xs text-blue-900 uppercase tracking-wide flex items-center gap-2">
-                      <Users className="w-3.5 h-3.5 text-blue-600" />
-                      {role.title}
+                      <Users className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                      <span>{role.title}</span>
                     </h4>
-                    <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
-                      {role.members.length} Orang/Bagian
+                    <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full shrink-0">
+                      {role.members.length} Petugas
                     </span>
                   </div>
 
-                  <ul className="space-y-1.5">
+                  <div className="grid grid-cols-2 gap-2">
                     {role.members.map((member, mIdx) => (
-                      <li
+                      <div
                         key={mIdx}
-                        className="text-xs text-slate-700 font-semibold bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 flex items-center justify-between"
+                        className="text-xs text-slate-700 font-semibold bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 flex items-center gap-2"
                       >
-                        <span>{member}</span>
-                      </li>
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                        <span className="truncate">{member}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               ))}
             </div>
@@ -926,31 +966,76 @@ export default function App() {
         {/* TAB 4: AKUN SAYA */}
         {activeTab === 'account' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs text-center space-y-3">
-              <div className="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center p-3 shadow-md border-4 border-slate-50">
-                <img src={logo} alt="Logo GKPI" className="w-full h-full object-contain" />
-              </div>
-              <div>
-                <h3 className="font-extrabold text-base text-slate-900">Pemuda GKPI Immanuel</h3>
-                <p className="text-xs text-slate-500 font-medium">Anggota Sektor Pemuda-Pemudi</p>
-                <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-3 py-0.5 rounded-full mt-1.5">
-                  ✓ Terautentikasi (Sesi Aktif)
-                </span>
+            {/* PROFIL HEADER HORIZONTAL */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xs border border-slate-100 shrink-0">
+                  <img src={logo} alt="Logo GKPI" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-slate-900">Pemuda GKPI Immanuel</h3>
+                  <p className="text-[11px] text-slate-500 font-medium">Sektor Pemuda-Pemudi</p>
+                  <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full mt-1">
+                    <CheckCircle2 className="w-3 h-3" /> Sesi Terautentikasi
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* MANAJEMEN PEMBAYARAN UANG NATAL (RESPONSIF & MODERN - GRADIASI HIJAU MUDA) */}
-            <div className="bg-gradient-to-br from-emerald-50 via-teal-50/40 to-white rounded-2xl p-4 sm:p-5 border border-emerald-200/80 shadow-xs space-y-4">
+            {/* MODUL ADMINISTRASI UTAMA (2 KOLOM SEJAJAR) */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gradient-to-br from-emerald-600 to-green-500 rounded-2xl p-4 text-white shadow-md shadow-emerald-600/20 flex flex-col justify-between space-y-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-emerald-100 font-bold text-[10px] uppercase tracking-wider">
+                    <UserCheck className="w-3.5 h-3.5 text-white" /> Presensi
+                  </div>
+                  <h4 className="font-extrabold text-xs leading-snug">
+                    Sistem Absensi Latihan
+                  </h4>
+                </div>
+
+                <button
+                  onClick={() => setActiveTab('attendance_page')}
+                  className="w-full bg-white text-emerald-800 hover:bg-emerald-50 font-extrabold text-[11px] py-2.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Buka Absensi</span>
+                </button>
+              </div>
+
+              <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-md shadow-orange-500/20 flex flex-col justify-between space-y-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-amber-100 font-bold text-[10px] uppercase tracking-wider">
+                    <ImageIcon className="w-3.5 h-3.5 text-white" /> Galeri
+                  </div>
+                  <h4 className="font-extrabold text-xs leading-snug">
+                    Dokumentasi Kegiatan
+                  </h4>
+                </div>
+
+                <a
+                  href={REDIRECT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-white text-orange-600 hover:bg-orange-50 font-extrabold text-[11px] py-2.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Buka Galeri</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+
+            {/* MANAJEMEN PEMBAYARAN UANG NATAL */}
+            <div className="bg-gradient-to-br from-emerald-50 via-teal-50/40 to-white rounded-2xl p-4 border border-emerald-200/80 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-2xs">
                     <Wallet className="w-4 h-4" />
                   </div>
                   <div>
                     <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-wide">
                       Kelola Pembayaran Natal
                     </h4>
-                    <p className="text-[10px] text-emerald-700 font-medium">Update status pelunasan</p>
+                    <p className="text-[10px] text-emerald-700 font-medium">Pembaruan status pelunasan</p>
                   </div>
                 </div>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-emerald-200">
@@ -958,19 +1043,19 @@ export default function App() {
                 </span>
               </div>
 
-              <form onSubmit={handleAddPaidMember} className="space-y-2 text-xs">
+              <form onSubmit={handleAddPaidMember} className="space-y-2.5 text-xs">
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
-                    placeholder="Ketik nama anggota..."
+                    placeholder="Masukkan nama anggota..."
                     value={newPaidName}
                     onChange={(e) => setNewPaidName(e.target.value)}
-                    className="flex-1 px-3.5 py-2.5 rounded-xl border border-emerald-200/90 focus:outline-none focus:border-emerald-600 bg-white font-semibold text-xs text-slate-800 placeholder-slate-400 shadow-inner"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl border border-emerald-200/90 focus:outline-none focus:border-emerald-600 bg-white font-semibold text-xs text-slate-800 placeholder-slate-400 shadow-2xs"
                   />
                   <select
                     value={newPaidCategory}
                     onChange={(e) => setNewPaidCategory(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl border border-emerald-200/90 focus:outline-none focus:border-emerald-600 font-bold text-xs bg-white text-slate-800 cursor-pointer shadow-xs"
+                    className="px-3 py-2.5 rounded-xl border border-emerald-200/90 focus:outline-none focus:border-emerald-600 font-bold text-xs bg-white text-slate-800 cursor-pointer shadow-2xs"
                   >
                     <option value="pemuda">Pemuda/i (Rp 60k)</option>
                     <option value="remaja">Remaja (Rp 40k)</option>
@@ -980,14 +1065,14 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-extrabold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-extrabold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <Plus className="w-4 h-4 stroke-[3]" />
-                      <span>TAMBAH PEMBAYAR LUNAS</span>
+                      <Plus className="w-4 h-4 stroke-[2.5]" />
+                      <span>Tambah Pembayar Lunas</span>
                     </>
                   )}
                 </button>
@@ -995,19 +1080,19 @@ export default function App() {
 
               {/* LIST ANGGOTA PEMBAYAR */}
               <div className="space-y-3 pt-1">
-                <div className="bg-white/80 rounded-xl p-3 border border-emerald-100 space-y-2 shadow-xs">
+                <div className="bg-white/90 rounded-xl p-3 border border-emerald-100 space-y-2 shadow-2xs">
                   <div className="flex items-center justify-between text-[11px] font-extrabold text-emerald-900 border-b border-emerald-50 pb-1.5">
-                    <span>SEKSI PEMUDA/I</span>
-                    <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-black">
+                    <span>Seksi Pemuda/i</span>
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-extrabold">
                       {pemudaList.length} Lunas
                     </span>
                   </div>
                   {pemudaList.length === 0 ? (
-                    <p className="text-[10px] text-slate-400 italic">Belum ada pembayar</p>
+                    <p className="text-[10px] text-slate-400 italic">Belum ada data pembayar</p>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
                       {pemudaList.map((item) => (
-                        <span key={item.id} className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-emerald-200/80 shadow-2xs">
+                        <span key={item.id} className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-emerald-200/80">
                           {item.name}
                           <button
                             onClick={() => handleRemovePaidMember(item.id)}
@@ -1022,19 +1107,19 @@ export default function App() {
                   )}
                 </div>
 
-                <div className="bg-white/80 rounded-xl p-3 border border-teal-100 space-y-2 shadow-xs">
+                <div className="bg-white/90 rounded-xl p-3 border border-teal-100 space-y-2 shadow-2xs">
                   <div className="flex items-center justify-between text-[11px] font-extrabold text-teal-900 border-b border-teal-50 pb-1.5">
-                    <span>SEKSI REMAJA</span>
-                    <span className="bg-teal-100 text-teal-800 text-[10px] px-2 py-0.5 rounded-full font-black">
+                    <span>Seksi Remaja</span>
+                    <span className="bg-teal-100 text-teal-800 text-[10px] px-2 py-0.5 rounded-full font-extrabold">
                       {remajaList.length} Lunas
                     </span>
                   </div>
                   {remajaList.length === 0 ? (
-                    <p className="text-[10px] text-slate-400 italic">Belum ada pembayar</p>
+                    <p className="text-[10px] text-slate-400 italic">Belum ada data pembayar</p>
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
                       {remajaList.map((item) => (
-                        <span key={item.id} className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-900 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-teal-200/80 shadow-2xs">
+                        <span key={item.id} className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-900 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-teal-200/80">
                           {item.name}
                           <button
                             onClick={() => handleRemovePaidMember(item.id)}
@@ -1051,44 +1136,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* CARD SISTEM ABSENSI PEMUDA (GRADIASI HIJAU) */}
-            <div className="bg-gradient-to-r from-emerald-600 to-green-500 rounded-2xl p-5 text-white shadow-lg shadow-emerald-600/20 space-y-3">
-              <div className="flex items-center gap-2 text-emerald-100 font-bold text-xs uppercase tracking-wider">
-                <UserCheck className="w-4 h-4 text-white" /> SISTEM ABSENSI PEMUDA
-              </div>
-              <h4 className="font-extrabold text-sm">
-                Kelola & Finalisasi Presensi Latihan
-              </h4>
-
-              <button
-                onClick={() => setActiveTab('attendance_page')}
-                className="w-full bg-white text-emerald-800 hover:bg-emerald-50 font-extrabold text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer"
-              >
-                <UserCheck className="w-4 h-4 text-emerald-600" />
-                <span>BUKA HALAMAN ABSENSI</span>
-              </button>
-            </div>
-
-            {/* CARD DOKUMENTASI TERSEDIA (GRADIASI ORANYE) */}
-            <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 text-white shadow-lg shadow-orange-500/20 space-y-3">
-              <div className="flex items-center gap-2 text-amber-100 font-bold text-xs uppercase tracking-wider">
-                <ImageIcon className="w-4 h-4 text-white" /> DOKUMENTASI TERSEDIA
-              </div>
-              <h4 className="font-extrabold text-sm">
-                Akses Galeri & Foto Kegiatan Natal
-              </h4>
-
-              <a
-                href={REDIRECT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full bg-white text-orange-600 hover:bg-orange-50 font-extrabold text-xs py-3 rounded-xl transition-all shadow-md cursor-pointer"
-              >
-                <span>Buka Dokumentasi</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
-
+            {/* INFORMASI GEREJA & TOMBOL KELUAR */}
             <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs divide-y divide-slate-100 text-xs font-medium text-slate-700">
               <div className="p-3.5 flex items-center justify-between">
                 <span className="text-slate-500 flex items-center gap-2">
@@ -1106,9 +1154,9 @@ export default function App() {
 
             <button
               onClick={handleLogout}
-              className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs py-2.5 rounded-xl transition-all cursor-pointer"
+              className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs py-3 rounded-xl transition-all cursor-pointer"
             >
-              Keluar / Logout
+              Keluar dari Sesi
             </button>
           </div>
         )}
@@ -1119,7 +1167,7 @@ export default function App() {
         <div className="max-w-md mx-auto flex items-center justify-around">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${activeTab === 'home' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${activeTab === 'home' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
               }`}
           >
             <Home className="w-5 h-5" />
@@ -1128,7 +1176,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('schedule')}
-            className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${activeTab === 'schedule' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${activeTab === 'schedule' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
               }`}
           >
             <Calendar className="w-5 h-5" />
@@ -1137,7 +1185,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('roles')}
-            className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${activeTab === 'roles' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${activeTab === 'roles' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
               }`}
           >
             <BookOpen className="w-5 h-5" />
@@ -1146,7 +1194,7 @@ export default function App() {
 
           <button
             onClick={handleAccountTabClick}
-            className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${activeTab === 'account' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${activeTab === 'account' ? 'text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600'
               }`}
           >
             <User className="w-5 h-5" />
@@ -1161,7 +1209,7 @@ export default function App() {
           <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-slate-100 space-y-4">
             <button
               onClick={() => setShowLoginModal(false)}
-              className="absolute top-4 right-4 p-1 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1170,11 +1218,11 @@ export default function App() {
               <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto p-1.5 shadow-md border border-slate-100">
                 <img src={logo} alt="Logo GKPI" className="w-full h-full object-contain" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-900">
-                LOGIN ANGGOTA PEMUDA
+              <h3 className="font-extrabold text-base text-slate-900 uppercase tracking-wide">
+                Login Anggota Pemuda
               </h3>
               <p className="text-xs text-slate-500">
-                Gunakan kredensial resmi pemuda untuk masuk.
+                Masukkan kredensial resmi pemuda untuk mengakses halaman administrasi.
               </p>
             </div>
 
@@ -1232,10 +1280,10 @@ export default function App() {
 
             <div>
               <span className="inline-block bg-blue-50 text-blue-700 text-[10px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider mb-1">
-                {daysRemaining === 0 ? 'HARI INI BGT!' : `${daysRemaining} HARI LAGI`}
+                {daysRemaining === 0 ? 'Hari Ini' : `${daysRemaining} Hari Lagi`}
               </span>
-              <h3 className="font-extrabold text-base text-slate-900">
-                PEMBERITAHUAN LATIHAN
+              <h3 className="font-extrabold text-base text-slate-900 uppercase tracking-wide">
+                Pemberitahuan Latihan
               </h3>
             </div>
 
@@ -1245,7 +1293,7 @@ export default function App() {
                 <span className="text-slate-500 font-semibold">{nextSchedule.time}</span>
               </div>
               <p className="font-bold text-slate-800">{nextSchedule.date}</p>
-              <p className="text-slate-600 flex items-center gap-1">
+              <p className="text-slate-600 flex items-center gap-1.5">
                 <Music className="w-3.5 h-3.5 text-blue-600" /> {nextSchedule.activity}
               </p>
             </div>
@@ -1254,13 +1302,13 @@ export default function App() {
               onClick={handleCloseScheduleNotice}
               className="w-full bg-gradient-to-r from-blue-600 to-sky-400 hover:from-blue-700 hover:to-sky-500 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-blue-500/20 cursor-pointer"
             >
-              SIAP LATIHAN!
+              Konfirmasi Kehadiran
             </button>
           </div>
         </div>
       )}
 
-      {/* MODAL DATA UANG NATAL (LIST YANG SUDAH LUNAS) - GLASSMORPHISM HIJAU MUDA */}
+      {/* MODAL DATA UANG NATAL (LIST YANG SUDAH LUNAS) */}
       {showUangNatalModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
           <div className="bg-gradient-to-br from-emerald-50/95 to-teal-50/95 backdrop-blur-xl w-full max-w-sm rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/60 text-slate-800 flex flex-col max-h-[85vh]">
@@ -1268,7 +1316,7 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <Wallet className="w-5 h-5 text-emerald-100" />
                 <h3 className="font-extrabold text-sm uppercase tracking-wide text-white">
-                  Pembayaran Lunas Uang Natal
+                  Data Pelunasan Iuran Natal
                 </h3>
               </div>
               <button
@@ -1281,22 +1329,22 @@ export default function App() {
 
             <div className="p-4 overflow-y-auto space-y-4 bg-transparent">
               {/* Seksi Pemuda */}
-              <div className="space-y-3 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-emerald-100 shadow-sm">
+              <div className="space-y-3 bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-emerald-100 shadow-xs">
                 <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2">
                   <div>
-                    <h4 className="font-extrabold text-xs text-emerald-950 uppercase">PEMUDA/I</h4>
-                    <p className="text-[10px] text-emerald-700 font-bold">Iuran: Rp 60.000</p>
+                    <h4 className="font-extrabold text-xs text-emerald-950 uppercase">Seksi Pemuda/i</h4>
+                    <p className="text-[10px] text-emerald-700 font-bold">Nominal: Rp 60.000</p>
                   </div>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2.5 py-1 rounded-full border border-emerald-200 shadow-2xs">
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-1 rounded-full border border-emerald-200">
                     {pemudaList.length} Orang
                   </span>
                 </div>
                 {pemudaList.length === 0 ? (
-                  <p className="text-[11px] text-slate-400 italic text-center">Belum ada pembayar</p>
+                  <p className="text-[11px] text-slate-400 italic text-center">Belum ada data pelunasan</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     {pemudaList.map((item) => (
-                      <div key={item.id} className="bg-white/90 border border-emerald-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 flex items-center gap-2 shadow-2xs hover:border-emerald-300 transition-all">
+                      <div key={item.id} className="bg-white/95 border border-emerald-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 flex items-center gap-2 shadow-2xs hover:border-emerald-300 transition-all">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                         <span className="truncate">{item.name}</span>
                       </div>
@@ -1306,22 +1354,22 @@ export default function App() {
               </div>
 
               {/* Seksi Remaja */}
-              <div className="space-y-3 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-teal-100 shadow-sm">
+              <div className="space-y-3 bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-teal-100 shadow-xs">
                 <div className="flex items-center justify-between border-b border-teal-200/60 pb-2">
                   <div>
-                    <h4 className="font-extrabold text-xs text-teal-950 uppercase">REMAJA</h4>
-                    <p className="text-[10px] text-teal-700 font-bold">Iuran: Rp 40.000</p>
+                    <h4 className="font-extrabold text-xs text-teal-950 uppercase">Seksi Remaja</h4>
+                    <p className="text-[10px] text-teal-700 font-bold">Nominal: Rp 40.000</p>
                   </div>
-                  <span className="text-[10px] bg-teal-100 text-teal-800 font-black px-2.5 py-1 rounded-full border border-teal-200 shadow-2xs">
+                  <span className="text-[10px] bg-teal-100 text-teal-800 font-extrabold px-2.5 py-1 rounded-full border border-teal-200">
                     {remajaList.length} Orang
                   </span>
                 </div>
                 {remajaList.length === 0 ? (
-                  <p className="text-[11px] text-slate-400 italic text-center">Belum ada pembayar</p>
+                  <p className="text-[11px] text-slate-400 italic text-center">Belum ada data pelunasan</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     {remajaList.map((item) => (
-                      <div key={item.id} className="bg-white/90 border border-teal-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 flex items-center gap-2 shadow-2xs hover:border-teal-300 transition-all">
+                      <div key={item.id} className="bg-white/95 border border-teal-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 flex items-center gap-2 shadow-2xs hover:border-teal-300 transition-all">
                         <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
                         <span className="truncate">{item.name}</span>
                       </div>
@@ -1331,12 +1379,12 @@ export default function App() {
               </div>
             </div>
 
-            <div className="p-3.5 bg-white/60 backdrop-blur-md border-t border-emerald-100 shrink-0 text-right">
+            <div className="p-3.5 bg-white/70 backdrop-blur-md border-t border-emerald-100 shrink-0 text-right">
               <button
                 onClick={() => setShowUangNatalModal(false)}
                 className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-extrabold px-5 py-3 rounded-xl text-xs cursor-pointer transition-all shadow-md shadow-emerald-600/20"
               >
-                Tutup Data
+                Tutup Jendela
               </button>
             </div>
           </div>
@@ -1368,21 +1416,21 @@ export default function App() {
               {selectedSchedule.hasSpecialSnack ? (
                 <div className="bg-gradient-to-br from-blue-50 to-sky-50 border border-blue-200 rounded-2xl p-4 text-center space-y-2">
                   <Sparkles className="w-6 h-6 text-blue-600 mx-auto" />
-                  <h4 className="font-bold text-blue-950 text-sm">
-                    KONSUMSI SPESIAL!
+                  <h4 className="font-bold text-blue-950 text-sm uppercase tracking-wide">
+                    Konsumsi Khusus
                   </h4>
-                  <div className="bg-white border border-blue-200 rounded-xl p-2.5 font-bold text-blue-800 shadow-xs">
+                  <div className="bg-white border border-blue-200 rounded-xl p-2.5 font-bold text-blue-800 shadow-2xs">
                     MAKAN ROTI & MINUM BANDREK
                   </div>
-                  <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-100 px-3 py-0.5 rounded-full">
-                    ✓ Gratis Disediakan Panitia
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-3 py-0.5 rounded-full">
+                    <CheckCircle2 className="w-3 h-3" /> Disediakan oleh Panitia
                   </span>
                 </div>
               ) : (
                 <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center space-y-2">
                   <Droplets className="w-6 h-6 text-blue-600 mx-auto" />
-                  <h4 className="font-bold text-blue-900 text-sm">
-                    AIR MINERAL CLEAN Q
+                  <h4 className="font-bold text-blue-900 text-sm uppercase tracking-wide">
+                    Air Mineral Clean Q
                   </h4>
                   <p className="text-slate-600 text-[11px]">
                     {selectedSchedule.snackNote}

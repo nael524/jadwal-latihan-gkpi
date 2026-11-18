@@ -204,22 +204,22 @@ const SCHEDULE_DATA = [
   // DESEMBER 2026
   {
     id: 16,
-    day: 'Sabtu',
-    date: '21 November 2026',
+    day: 'Jumat',
+    date: '20 November 2026',
     time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Kegiatan Natal',
-    hasSpecialSnack: false,
-    snackTitle: 'Air Mineral (Clean Q)',
-    snackNote: 'Air Mineral Clean Q Disediakan Panitia'
+    activity: 'Latihan Koor Natal',
+    hasSpecialSnack: true,
+    snackTitle: 'Makan Roti & Minum Bandrek',
+    snackNote: 'Makan Roti & Minum Bandrek dan Lainnya Disediakan Panitia'
   },
   {
     id: 17,
-    day: 'Minggu',
-    date: '22, November 2026',
-    time: '14.00 Siang',
+    day: 'Sabtu',
+    date: '21, November 2026',
+    time: '19.00 Malam',
     location: 'Gereja GKPI Immanuel',
-    activity: 'Latihan Koor Natal',
+    activity: 'Latihan Kegiatan Natal',
     hasSpecialSnack: false,
     snackTitle: 'Air Mineral (Clean Q)',
     snackNote: 'Air Mineral Clean Q Disediakan Panitia'
